@@ -1,0 +1,23 @@
+{
+    "extends": "./node_modules/pcf-scripts/tsconfig_base.json",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "jsx": "react-jsx",
+        "lib": ["dom", "es2015", "es2017", "es2020"],
+        "strict": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "typeRoots": ["node_modules/@types"],
+        "types": ["powerapps-component-framework", "react", "react-dom"]
+    },
+
+    "include": [
+    "SampleControl/**/*.ts",
+    "SampleControl/**/*.tsx",
+    "typings/*.d.ts"
+    ]
+}
+
+
