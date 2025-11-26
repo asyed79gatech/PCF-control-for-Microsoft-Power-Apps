@@ -67,13 +67,39 @@ type PaneState =
  | { mode: "column"; index: number }
  | { mode: "row"; index: number }
  | null;
+ 
 export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
- const init = React.useMemo(() => parsePayload(initialJson), [initialJson]);
- const [columns, setColumns] = React.useState<string[]>(init.Columns);
- const [rows, setRows] = React.useState<Row[]>(init.Rows);
- const [visitMeta, setVisitMeta] = React.useState<VisitMeta[]>(init.VisitMeta || []);
- const [assessmentMeta, setAssessmentMeta] = React.useState<AssessmentMeta[]>(init.AssessmentMeta || []);
- const [pane, setPane] = React.useState<PaneState>(null);
+
+  // start with defaults
+
+  const [columns, setColumns] = React.useState<string[]>(DEFAULT_TABLE.Columns);
+
+  const [rows, setRows] = React.useState<Row[]>(DEFAULT_TABLE.Rows);
+
+  const [visitMeta, setVisitMeta] = React.useState<VisitMeta[]>([]);
+
+  const [assessmentMeta, setAssessmentMeta] = React.useState<AssessmentMeta[]>([]);
+
+  const [pane, setPane] = React.useState<PaneState>(null);
+
+  // whenever initialJson changes (e.g., varMatrixJSON loaded from SharePoint),
+
+  // re-hydrate the table state from it
+
+  React.useEffect(() => {
+
+    const parsed = parsePayload(initialJson);
+
+    setColumns(parsed.Columns);
+
+    setRows(parsed.Rows);
+
+    setVisitMeta(parsed.VisitMeta || []);
+
+    setAssessmentMeta(parsed.AssessmentMeta || []);
+
+  }, [initialJson]);
+ 
  // keep JSON in sync
  React.useEffect(() => {
    const payload: TablePayload = {
