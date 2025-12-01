@@ -121,3 +121,10 @@
 .dm-pane-footer button {
  padding: 4px 10px;
 }
+.dm-clickable {
+ cursor: pointer;
+}
+.dm-col-header.dm-clickable,
+.dm-row-header.dm-clickable {
+ background-color: #f3f2f1;
+}

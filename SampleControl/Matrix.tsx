@@ -67,7 +67,7 @@ type PaneState =
  | { mode: "column"; index: number }
  | { mode: "row"; index: number }
  | null;
- 
+
 export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
 
   // start with defaults
@@ -345,43 +345,37 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
              {columns.map((c, i) => (
 <th key={i}>
 <div className="dm-col-header-wrapper">
+     {/* Clicking this input opens the Build Visit pane */}
 <input
-                     value={c}
-                     onChange={e => renameColumn(i, e.target.value)}
-                     className="dm-input dm-col-header"
-                   />
+       value={c}
+       readOnly
+       onClick={() => setPane({ mode: "column", index: i })}
+       className="dm-input dm-col-header dm-clickable"
+     />
 <div className="dm-header-buttons">
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => moveColumn(i, i - 1)}
-                       title="Move left"
+         type="button"
+         className="dm-small"
+         onClick={() => moveColumn(i, i - 1)}
+         title="Move left"
 >
-                       ←
+         ←
 </button>
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => moveColumn(i, i + 1)}
-                       title="Move right"
+         type="button"
+         className="dm-small"
+         onClick={() => moveColumn(i, i + 1)}
+         title="Move right"
 >
-                       →
+         →
 </button>
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => setPane({ mode: "column", index: i })}
-                       title="Build visit"
+         type="button"
+         className="dm-danger dm-small"
+         onClick={() => removeColumn(i)}
+         title="Delete column"
 >
-                       ⚙
-</button>
-<button
-                       type="button"
-                       className="dm-danger dm-small"
-                       onClick={() => removeColumn(i)}
-                       title="Delete column"
->
-                       ×
+         ×
 </button>
 </div>
 </div>
@@ -394,43 +388,37 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
 <tr key={ri}>
 <td>
 <div className="dm-row-head">
+   {/* Clicking this input opens the Build Assessment pane */}
 <input
-                     value={r.RowHeader}
-                     onChange={e => renameRow(ri, e.target.value)}
-                     className="dm-input dm-row-header"
-                   />
+     value={r.RowHeader}
+     readOnly
+     onClick={() => setPane({ mode: "row", index: ri })}
+     className="dm-input dm-row-header dm-clickable"
+   />
 <div className="dm-header-buttons">
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => moveRow(ri, ri - 1)}
-                       title="Move up"
+       type="button"
+       className="dm-small"
+       onClick={() => moveRow(ri, ri - 1)}
+       title="Move up"
 >
-                       ↑
+       ↑
 </button>
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => moveRow(ri, ri + 1)}
-                       title="Move down"
+       type="button"
+       className="dm-small"
+       onClick={() => moveRow(ri, ri + 1)}
+       title="Move down"
 >
-                       ↓
+       ↓
 </button>
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => setPane({ mode: "row", index: ri })}
-                       title="Build assessment"
+       type="button"
+       className="dm-danger dm-small"
+       onClick={() => removeRow(ri)}
+       title="Delete row"
 >
-                       ⚙
-</button>
-<button
-                       type="button"
-                       className="dm-danger dm-small"
-                       onClick={() => removeRow(ri)}
-                       title="Delete row"
->
-                       ×
+       ×
 </button>
 </div>
 </div>
