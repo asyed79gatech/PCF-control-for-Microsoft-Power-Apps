@@ -4,19 +4,369 @@ type VisitMeta = {
  VisitNumber?: string;
  VisitName?: string;
 };
+
 type AssessmentMeta = {
  AssessmentName?: string;
+ Eye?: string;
+ Correction?: string;
+ Notation?: string;
+ Distance?: string;
+ Lighting?: string;
+ Contrast?: string;
+ Specify_Bioslit?: string;
+ Metadata_Bioslit?: string[]
 };
+
 type TablePayload = {
  Columns: string[];
  Rows: Row[];
  VisitMeta?: VisitMeta[];
  AssessmentMeta?: AssessmentMeta[];
+ AssessmentNames?: string[];
 };
 export type MatrixProps = {
  initialJson?: string;
  onChange: (json: string) => void;
 };
+
+// All Assessment options in the dropdown
+const ASSESSMENT_OPTIONS: string[] = [
+ "Aberrometry",
+ "Adverse Event(s)",
+ "Autorefractometry",
+ "Axial Length",
+ "Axis Orientation",
+ "Baseline Characteristics",
+ "Best Corrected Distance Visual Acuity (BCDVA)",
+ "Best Corrected Intermediate Visual Acuity (BCIVA)",
+ "Best Corrected Near Visual Acuity (BCNVA)",
+ "Best Corrected Visual Acuity (BCVA)",
+ "Biometry",
+ "Biomicroscopy",
+ "Canadian Dry Eye Epidemiology Study (CANDEES)",
+ "Nd:YAG capsulotomy",
+ "Cataract Grading",
+ "Conjunctival Staining",
+ "Contact Lens Corrected Distance Visual Acuity (CLCDVA)",
+ "Contact Lens Dry Eye Questionnaire (CLDEQ)",
+ "Continuous Wear Duration",
+ "Contrast Sensitivity",
+ "Corneal Topography",
+ "Cycloplegic Refraction",
+ "Defocus Curve",
+ "Demographics",
+ "Device Deficiency",
+ "Digital Device Use",
+ "Distance Corrected Intermediate Visual Acuity (DCIVA)",
+ "Distance Corrected Near Visual Acuity (DCNVA)",
+ "Distance Corrected Visual Acuity (DCVA)",
+ "Dry Eye Drops Usage",
+ "Dry Eye Questionnaire (DEQ)",
+ "Dry Eye Screening for Dry Eye Epidemiology Projects (DEEP)",
+ "ECP Rating on Ease of Fit",
+ "ePRO",
+ "Exposure",
+ "Fundus Examination",
+ "Gonioscopy",
+ "Habitual History",
+ "History of Primary Diagnosis",
+ "Horizontal Visible Iris Diameter (HVID)",
+ "Hours of Digital Use Per Day",
+ "Impact of Dry Eye in Everyday Life (IDEEL)",
+ "Inclusion / Exclusion Criteria",
+ "Informed Consent",
+ "Intraocular Lens Satisfaction (IOLSAT)",
+ "Intraocular Pressure",
+ "IOL Information",
+ "IOL Observations",
+ "IOL Position (Tilt and Centration)",
+ "IP Dispense",
+ "Keratometry",
+ "Lens Fit Assessments",
+ "Lens Oscillation",
+ "Lens Rotational Recovery",
+ "Lens Settling Time",
+ "Lens Surface Assessments (Wettabiity, Deposits)",
+ "Lens Wear Time",
+ "Lissamine Green Circumlimbal Conjunctival Staining",
+ "Manifest Refraction",
+ "McCarty Symptom Questionnaire",
+ "McMonnies Questionnaire",
+ "Medical History and Concomitant Medications",
+ "Meibomian Gland Functionality Assessment",
+ "Misallocation",
+ "National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)",
+ "Non-Invasive Keratography Break-Up Time (NIKBUT)",
+ "Non-Invasive Tear Break-Up Time (NITBUT)",
+ "Number of Lenses for Successful Fit",
+ "Objective Refraction",
+ "Ocular Comfort Index (OCI)",
+ "Ocular Hypotensive Medications",
+ "Ocular Surface Disease Index (OSDI)",
+ "Optical Coherence Tomography (OCT)",
+ "Optional Assessments",
+ "Pachymetry",
+ "Physical Examination (Targeted)",
+ "Posterior Capsule Opacification",
+ "Pregnancy Test",
+ "Pupil Size",
+ "Quality of Vision (QoV)",
+ "Questionnaire for Visual Disturbances (QUVID)",
+ "Range of Vision",
+ "Reading Speed",
+ "Rewetting Drop Usage",
+ "Schein Questionnaire",
+ "Scribe Mark Visibility",
+ "Slit Lamp Examination",
+ "Standard Patient Evaluation of Eye Dryness Questionnaire (SPEED)",
+ "Stereopsis Test",
+ "Study Lens Power",
+ "Subject Diary",
+ "Subjective Likert Questionnaire (5-Point Scale)",
+ "Subjective Ratings",
+ "Subjective Ratings (1-10 Scale)",
+ "Symptom Assessment In Dry Eye (SANDE)",
+ "Symptomatology Questionnaire",
+ "Symptoms, Problems, and Complaints",
+ "Tear Meniscus Height",
+ "Texas Eye Research and Technology Center Dry Eye Questionnaire (TERTC-DEQ)",
+ "Time to Questionnaire Completion",
+ "Uncorrected Distance Visual Acuity (UCDVA)",
+ "Uncorrected Intermediate Visual Acuity (UCIVA)",
+ "Uncorrected Near Visual Acuity (UCNVA)",
+ "Uncorrected Visual Acuity (UCVA)",
+ "Unplanned Lens Replacment",
+ "Vision Stability with Blink",
+ "Visual Acuity",
+ "Visual Analog Scale (VAS)",
+ "Visual Blur Profile",
+ "Visual Field Test",
+ "Vital Signs",
+ "Surgical Report",
+ "Depth of Focus",
+ "Severity Score",
+ "Secondary Surgical Interventions",
+ "Anterior Chamber Depth",
+ "Target Residual Refractive Error",
+ "Predicted Residual Astigmatism",
+ "Stimulus-Based Subjective Questions",
+ "Real-World Subjective Questions",
+ "Randomization"
+];
+// Assessments that should trigger only the Eye dropdown (plus any VA assessments)
+const ASSESSMENTS_WITH_EYE: string[] = [
+ "Aberrometry",
+ "Autorefractometry",
+ "Axial Length",
+ "Axis Orientation",
+ "Biometry",
+ "Nd:YAG capsulotomy",
+ "Cataract Grading",
+ "Conjunctival Staining",
+ "Continuous Wear Duration",
+ "Corneal Topography",
+ "Device Deficiency",
+ "Dry Eye Drops Usage",
+ "Dry Eye Questionnaire (DEQ)",
+ "Dry Eye Screening for Dry Eye Epidemiology Projects (DEEP)",
+ "ECP Rating on Ease of Fit",
+ "Fundus Examination",
+ "Gonioscopy",
+ "History of Primary Diagnosis",
+ "Horizontal Visible Iris Diameter (HVID)",
+ "Impact of Dry Eye in Everyday Life (IDEEL)",
+ "Intraocular Lens Satisfaction (IOLSAT)",
+ "Intraocular Pressure",
+ "IOL Information",
+ "IOL Observations",
+ "IOL Position (Tilt and Centration)",
+ "Keratometry",
+ "Lens Oscillation",
+ "Lens Rotational Recovery",
+ "Lens Settling Time",
+ "Lens Surface Assessments (Wettabiity, Deposits)",
+ "Lens Wear Time",
+ "Lissamine Green Circumlimbal Conjunctival Staining",
+ "McCarty Symptom Questionnaire",
+ "McMonnies Questionnaire",
+ "Meibomian Gland Functionality Assessment",
+ "National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)",
+ "Non-Invasive Keratography Break-Up Time (NIKBUT)",
+ "Non-Invasive Tear Break-Up Time (NITBUT)",
+ "Number of Lenses for Successful Fit",
+ "Ocular Comfort Index (OCI)",
+ "Ocular Surface Disease Index (OSDI)",
+ "Optical Coherence Tomography (OCT)",
+ "Pachymetry",
+ "Posterior Capsule Opacification",
+ "Pupil Size",
+ "Quality of Vision (QoV)",
+ "Questionnaire for Visual Disturbances (QUVID)",
+ "Rewetting Drop Usage",
+ "Schein Questionnaire",
+ "Scribe Mark Visibility",
+ "Standard Patient Evaluation of Eye Dryness Questionnaire (SPEED)",
+ "Stereopsis Test",
+ "Study Lens Power",
+ "Symptom Assessment In Dry Eye (SANDE)",
+ "Tear Meniscus Height",
+ "Texas Eye Research and Technology Center Dry Eye Questionnaire (TERTC-DEQ)",
+ "Unplanned Lens Replacment",
+ "Vision Stability with Blink",
+ "Visual Blur Profile",
+ "Surgical Report",
+ "Secondary Surgical Interventions",
+ "Anterior Chamber Depth",
+ "Target Residual Refractive Error",
+ "Predicted Residual Astigmatism",
+ "Stimulus-Based Subjective Questions",
+ "Real-World Subjective Questions",
+ "Randomization"
+];
+// Visual Acuity–based assessments (VA logic)
+const VISUAL_ACUITY_ASSESSMENTS: string[] = [
+ "Best Corrected Distance Visual Acuity (BCDVA)",
+ "Best Corrected Intermediate Visual Acuity (BCIVA)",
+ "Best Corrected Near Visual Acuity (BCNVA)",
+ "Best Corrected Visual Acuity (BCVA)",
+ "Contact Lens Corrected Distance Visual Acuity (CLCDVA)",
+ "Distance Corrected Intermediate Visual Acuity (DCIVA)",
+ "Distance Corrected Near Visual Acuity (DCNVA)",
+ "Distance Corrected Visual Acuity (DCVA)",
+ "Uncorrected Distance Visual Acuity (UCDVA)",
+ "Uncorrected Intermediate Visual Acuity (UCIVA)",
+ "Uncorrected Near Visual Acuity (UCNVA)",
+ "Uncorrected Visual Acuity (UCVA)"
+];
+
+// Visual Bioslit assessments (VA logic)
+const BIOSLIT_ASSESSMENTS: string[] = [
+ "Biomicroscopy",
+ "Slit Lamp Examination",
+];
+
+const CORRECTION_OPTIONS: string[] = [
+ "with Habitual Correction",
+ "with Habitual Lens",
+ "with Study Lenses",
+ "with Study Lenses and Over-Spectacles",
+ "with Over Refraction",
+ "with Manifest Refraction",
+ "with Autorefraction"
+];
+const EYE_OPTIONS: string[] = [
+ "OD",
+ "OS",
+ "OU",
+ "Study Eye",
+ "Monocular",
+ "Binocular",
+ "OD/OS",
+ "OD/OS/OU",
+ "(Fellow Eye)"
+];
+const NOTATION_OPTIONS: string[] = [
+ "Snellen",
+ "logMAR",
+ "Decimal",
+ "Letters Read"
+];
+const DISTANCE_OPTIONS: string[] = [
+ "6m",
+ "4m",
+ "2m",
+ "1m",
+ "120cm",
+ "66cm",
+ "60cm",
+ "40cm",
+ "33cm"
+];
+const LIGHTING_OPTIONS: string[] = [
+ "Photopic",
+ "Mesopic",
+ "Scotopic",
+ "Bright Light"
+];
+const CONTRAST_OPTIONS: string[] = [
+ "High Contrast",
+ "Low Contrast"
+];
+
+const BIOSLIT_SPECIFY: string[] = [
+"(Change in Corneal Signs)",
+"(Corneal Haze)",
+"(Epithelial Defect)",
+"(Epithelial Ingrowth)",
+"(Lens Opacification)",
+"(Retroillumination)",
+"(Targeted)",
+"(Posterior capsule opacification)",
+"(Posterior capsulotomy evaluation)"
+];
+
+const BIOSLIT_METADATA_MULTISELECT: string[] = [
+"Anterior capsule phimosis",
+"Anterior Chamber Cells",
+"Anterior Chamber Flare",
+"Anterior Chamber Synechiae",
+"Arcus Lipoides",
+"Bulbar Redness",
+"Chemosis",
+"Conjunctiva",
+"Conjunctival Compression/Indentation",
+"Conjunctival Edema",
+"Conjunctival Hyperemia",
+"Conjunctival Staining",
+"Cornea",
+"Corneal Edema",
+"Corneal Epithelial Edema",
+"Corneal Infiltrates",
+"Corneal Staining",
+"Corneal Stromal Edema",
+"Corneal Vascularization",
+"Keratic Precipitates",
+"Lens Opacity",
+"Lens Status",
+"Lids",
+"Limbal Hyperemia",
+"Microbial Keratitis",
+"Neovascularization and Stromal Haze",
+"Palpebral Conjunctival",
+"Posterior Chamber Synechiae",
+"Rueosis Iridis",
+"Subconjunctival Hemorrhage"
+];
+
+const [openBioSlitMenuIndex, setOpenBioSlitMenuIndex] = React.useState<number | null>(null);
+
+const hasEyeDropdown = (name?: string): boolean =>
+ !!name && (ASSESSMENTS_WITH_EYE.includes(name) || VISUAL_ACUITY_ASSESSMENTS.includes(name));
+const isVisualAcuityAssessment = (name?: string): boolean =>
+ !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
+const isBioslitAssessment = (name?: string): boolean =>
+ !!name && BIOSLIT_ASSESSMENTS.includes(name);
+
+const formatAssessmentHeader = (meta: AssessmentMeta): string => {
+ if (!meta.AssessmentName) return "";
+ const parts: string[] = [];
+ // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
+ if (meta.Eye) parts.push(meta.Eye);
+ if (meta.Correction) parts.push(meta.Correction);
+ if (meta.Notation) parts.push(meta.Notation);
+ if (meta.Distance) parts.push(meta.Distance);
+ if (meta.Lighting) parts.push(meta.Lighting);
+ if (meta.Contrast) parts.push(meta.Contrast);
+ if (meta.Specify_Bioslit) parts.push(meta.Specify_Bioslit);
+
+ if (parts.length === 0) {
+   return meta.AssessmentName;
+ }
+ // "AssessmentName Eye, Correction, Notation, Distance, Lighting, Contrast"
+ return `${meta.AssessmentName} ${parts.join(", ")}`;
+};
+
+
 const DEFAULT_COLUMNS = ["", ""];
 const DEFAULT_ROWS: Row[] = [
  { RowHeader: "", Cells: ["", ""] },
@@ -26,7 +376,8 @@ const DEFAULT_TABLE: TablePayload = {
  Columns: DEFAULT_COLUMNS,
  Rows: DEFAULT_ROWS,
  VisitMeta: [],
- AssessmentMeta: []
+ AssessmentMeta: [],
+ AssessmentNames: []
 };
 function normalizePayload(obj: Partial<TablePayload>): TablePayload {
  const cols = Array.isArray(obj.Columns) && obj.Columns.length > 0 ? obj.Columns : DEFAULT_COLUMNS;
@@ -46,11 +397,13 @@ function normalizePayload(obj: Partial<TablePayload>): TablePayload {
  }));
  const visitMeta = Array.isArray(obj.VisitMeta) ? obj.VisitMeta : [];
  const assessmentMeta = Array.isArray(obj.AssessmentMeta) ? obj.AssessmentMeta : [];
+ const assessmentNames = Array.isArray(obj.AssessmentNames) ? obj.AssessmentNames : undefined;
  return {
    Columns: cols,
    Rows: normRows,
    VisitMeta: visitMeta,
-   AssessmentMeta: assessmentMeta
+   AssessmentMeta: assessmentMeta,
+   AssessmentNames: assessmentNames
  };
 }
 function parsePayload(raw?: string): TablePayload {
@@ -101,15 +454,20 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
   }, [initialJson]);
  
  // keep JSON in sync
- React.useEffect(() => {
-   const payload: TablePayload = {
-     Columns: columns,
-     Rows: rows,
-     VisitMeta: visitMeta,
-     AssessmentMeta: assessmentMeta
-   };
-   onChange(JSON.stringify(payload));
- }, [columns, rows, visitMeta, assessmentMeta, onChange]);
+React.useEffect(() => {
+ const assessmentNames = assessmentMeta
+   .map(m => m.AssessmentName)
+   .filter((x): x is string => !!x);
+ const payload: TablePayload = {
+   Columns: columns,
+   Rows: rows,
+   VisitMeta: visitMeta,
+   AssessmentMeta: assessmentMeta,
+   AssessmentNames: assessmentNames
+ };
+ onChange(JSON.stringify(payload));
+}, [columns, rows, visitMeta, assessmentMeta, onChange]);
+
  // --- helpers ------------------------------------------------------
  const addColumn = () => {
    const newColName = "";
@@ -209,22 +567,37 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
      return arr;
    });
  };
- const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => {
-   setAssessmentMeta(prev => {
-     const arr = [...prev];
-     const current = arr[index] || {};
-     const updated: AssessmentMeta = { ...current, ...patch };
-     arr[index] = updated;
-     const headerText = updated.AssessmentName ?? "";
-     setRows(prevRows => {
-       const rowsCopy = [...prevRows];
-       const row = rowsCopy[index] || { RowHeader: "", Cells: Array(columns.length).fill("") };
-       rowsCopy[index] = { ...row, RowHeader: headerText };
-       return rowsCopy;
-     });
-     return arr;
+const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => {
+ setAssessmentMeta(prev => {
+   const arr = [...prev];
+   const current = arr[index] || {};
+   let updated: AssessmentMeta = { ...current, ...patch };
+   // If AssessmentName changed, reset dependent fields
+   if (patch.AssessmentName !== undefined) {
+     updated = {
+       AssessmentName: patch.AssessmentName,
+       Eye: undefined,
+       Correction: undefined,
+       Notation: undefined,
+       Distance: undefined,
+       Lighting: undefined,
+       Contrast: undefined,
+       Specify_Bioslit: undefined,
+       Metadata_Bioslit: []
+
+     };
+   }
+   arr[index] = updated;
+   const headerText = formatAssessmentHeader(updated);
+   setRows(prevRows => {
+     const rowsCopy = [...prevRows];
+     const row = rowsCopy[index] || { RowHeader: "", Cells: Array(columns.length).fill("") };
+     rowsCopy[index] = { ...row, RowHeader: headerText };
+     return rowsCopy;
    });
- };
+   return arr;
+ });
+};
  // --- render panes -------------------------------------------------
  const renderPane = () => {
    if (!pane) return null;
@@ -293,31 +666,220 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
    }
    if (pane.mode === "row") {
      const am = assessmentMeta[pane.index] || {};
+     const showEye = hasEyeDropdown(am.AssessmentName);
+     const isVA = isVisualAcuityAssessment(am.AssessmentName);
+     const isBioslit = isBioslitAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
 <div className="dm-pane-header">
 <h3>Build Assessment (Row {pane.index + 1})</h3>
 <button type="button" className="dm-pane-close" onClick={() => setPane(null)}>
-               ×
+           ×
 </button>
 </div>
+       {/* Assessment name selector */}
 <div className="dm-pane-field">
 <label>Assessment Name</label>
 <select
-               value={am.AssessmentName ?? ""}
-               onChange={e => updateAssessmentMeta(pane.index, { AssessmentName: e.target.value })}
+           value={am.AssessmentName ?? ""}
+           onChange={e => updateAssessmentMeta(pane.index, { AssessmentName: e.target.value })}
 >
 <option value=""></option>
-<option value="Adverse Events">Adverse Events</option>
-<option value="Demographics">Demographics</option>
-<option value="Inclusion/ Exclusion Criteria">Inclusion/ Exclusion Criteria</option>
-<option value="Informed Consent">Informed Consent</option>
+           {ASSESSMENT_OPTIONS.map(name => (
+<option key={name} value={name}>
+               {name}
+</option>
+           ))}
 </select>
 </div>
+       {/* Eye dropdown (for eye-based or VA assessments) */}
+       {showEye && (
+<div className="dm-pane-field">
+<label>Eye</label>
+<select
+             value={am.Eye ?? ""}
+             onChange={e => updateAssessmentMeta(pane.index, { Eye: e.target.value })}
+>
+<option value=""></option>
+             {EYE_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                 {opt}
+</option>
+             ))}
+</select>
+</div>
+       )}
+       {/* Visual acuity–specific dropdowns */}
+       {isVA && (
+<>
+<div className="dm-pane-field">
+<label>Correction</label>
+<select
+               value={am.Correction ?? ""}
+               onChange={e => updateAssessmentMeta(pane.index, { Correction: e.target.value })}
+>
+<option value=""></option>
+               {CORRECTION_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                   {opt}
+</option>
+               ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Notation</label>
+<select
+               value={am.Notation ?? ""}
+               onChange={e => updateAssessmentMeta(pane.index, { Notation: e.target.value })}
+>
+<option value=""></option>
+               {NOTATION_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                   {opt}
+</option>
+               ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Distance</label>
+<select
+               value={am.Distance ?? ""}
+               onChange={e => updateAssessmentMeta(pane.index, { Distance: e.target.value })}
+>
+<option value=""></option>
+               {DISTANCE_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                   {opt}
+</option>
+               ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Lighting</label>
+<select
+               value={am.Lighting ?? ""}
+               onChange={e => updateAssessmentMeta(pane.index, { Lighting: e.target.value })}
+>
+<option value=""></option>
+               {LIGHTING_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                   {opt}
+</option>
+               ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Contrast</label>
+<select
+               value={am.Contrast ?? ""}
+               onChange={e => updateAssessmentMeta(pane.index, { Contrast: e.target.value })}
+>
+<option value=""></option>
+               {CONTRAST_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                   {opt}
+</option>
+               ))}
+</select>
+</div>
+</>
+       )}
+
+
+       {/* Bioslit–specific dropdowns */}
+       {isBioslit && (
+<>
+<div className="dm-pane-field">
+<label>Specify</label>
+<select
+               value={am.Specify_Bioslit ?? ""}
+               onChange={e => updateAssessmentMeta(pane.index, { Specify_Bioslit: e.target.value })}
+>
+<option value=""></option>
+               {BIOSLIT_SPECIFY.map(opt => (
+<option key={opt} value={opt}>
+                   {opt}
+</option>
+               ))}
+</select>
+</div>
+
+
+{/* Metadata (multi-select dropdown, NOT in header) */}
+<div className="dm-pane-field">
+<label>Metadata</label>
+<div className="dm-multi-dropdown">
+       {/* Control Box */}
+<div
+         className="dm-multi-dropdown-control"
+         onClick={() => setOpenBioSlitMenuIndex(
+          openBioSlitMenuIndex === pane.index ? null: pane.index
+          )
+          }
+>
+         {/* Chips */}
+         {am.Metadata_Bioslit && am.Metadata_Bioslit.length > 0 && (
+<div className="dm-tags-row">
+             {am.Metadata_Bioslit.map(tag => (
+<span
+                 key={tag}
+                 className="dm-tag"
+                 onClick={e => {
+                   e.stopPropagation(); // don’t toggle the menu when clicking X
+                   const current = am.Metadata_Bioslit || [];
+                   const next = current.filter(x => x !== tag);
+                   updateAssessmentMeta(pane.index, { Metadata_Bioslit: next });
+                 }}
+>
+                 {tag}
+<span className="dm-tag-x">×</span>
+</span>
+             ))}
+</div>
+         )}
+         {/* “Select” row inside the control */}
+<div className="dm-select-row">
+<span className="dm-select-text">Select</span>
+</div>
+<span className="dm-caret">▾</span>
+</div>
+       {/* Dropdown menu */}
+       {openBioSlitMenuIndex && (
+<div className="dm-multi-dropdown-menu">
+           {BIOSLIT_METADATA_MULTISELECT.map(opt => {
+             const selected = (am.Metadata_Bioslit || []).includes(opt);
+             return (
+<div
+                 key={opt}
+                 className={
+                   "dm-multi-dropdown-item" + (selected ? " dm-selected" : "")
+                 }
+                 onClick={e => {
+                   e.stopPropagation();
+                   const current = am.Metadata_Bioslit || [];
+                   const exists = current.includes(opt);
+                   const next = exists
+                     ? current.filter(x => x !== opt)
+                     : [...current, opt];
+                   updateAssessmentMeta(pane.index, { Metadata_Bioslit: next });
+                 }}
+>
+                 {opt}
+</div>
+             );
+           })}
+</div>
+       )}
+</div>
+</div>
+</>
+       )}
+
+
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
-               Save & Close
+           Save & Close
 </button>
 </div>
 </div>
@@ -388,13 +950,12 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
 <tr key={ri}>
 <td>
 <div className="dm-row-head">
-   {/* Clicking this input opens the Build Assessment pane */}
-<input
-     value={r.RowHeader}
-     readOnly
+<div
+     className="dm-row-header-display dm-clickable"
      onClick={() => setPane({ mode: "row", index: ri })}
-     className="dm-input dm-row-header dm-clickable"
-   />
+>
+     {r.RowHeader}
+</div>
 <div className="dm-header-buttons">
 <button
        type="button"

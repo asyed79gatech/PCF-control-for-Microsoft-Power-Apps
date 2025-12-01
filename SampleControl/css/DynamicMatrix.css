@@ -46,7 +46,7 @@
 }
 .dm-row-head {
  display: flex;
- align-items: center;
+ align-items: flex-start;
  gap: 4px;
 }
 .dm-col-header-wrapper {
@@ -124,7 +124,96 @@
 .dm-clickable {
  cursor: pointer;
 }
-.dm-col-header.dm-clickable,
+
 .dm-row-header.dm-clickable {
  background-color: #f3f2f1;
+}
+
+.dm-row-header-display {
+ flex: 1 1 0;          /* allow it to shrink inside the flex row */
+ min-width: 0;         /* CRITICAL: let it be narrower than its content */
+ padding: 4px;
+ min-height: 32px;
+ white-space: normal;  /* wrap normally */
+ word-break: break-word;
+ background: #fff;
+ border: 1px solid #ccc;
+ box-sizing: border-box;
+}
+
+
+.dm-multi-dropdown {
+ position: relative;
+ width: 100%;
+}
+.dm-multi-dropdown-control {
+ display: flex;
+ flex-direction: column;
+ min-height: 40px;
+ padding: 4px 28px 4px 8px;
+ border: 1px solid #ccc;
+ background: #fff;
+ box-sizing: border-box;
+ cursor: pointer;
+ gap: 4px;
+}
+/* row that holds the chips */
+.dm-tags-row {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 4px;
+}
+/* row that looks like the “Select” input line */
+.dm-select-row {
+ border-top: 1px dotted #999;   /* that dashed line you see */
+ margin-top: 2px;
+ padding-top: 2px;
+}
+.dm-select-text {
+ font-size: 12px;
+ color: #666;
+}
+.dm-caret {
+ position: absolute;
+ right: 8px;
+ top: 50%;
+ transform: translateY(-50%);
+ font-size: 10px;
+ pointer-events: none;
+}
+.dm-tag {
+ display: inline-flex;
+ align-items: center;
+ padding: 2px 6px;
+ border-radius: 12px;
+ background: #e5f1fb;
+ font-size: 11px;
+}
+.dm-tag-x {
+ margin-left: 4px;
+ font-weight: bold;
+}
+.dm-multi-dropdown-menu {
+ position: absolute;
+ left: 0;
+ right: 0;
+ margin-top: 2px;
+ max-height: 180px;
+ overflow-y: auto;
+ border: 1px solid #ccc;
+ background: #fff;
+ z-index: 50;
+ box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.dm-multi-dropdown-item {
+ padding: 6px 8px;
+ font-size: 12px;
+ cursor: pointer;
+}
+.dm-multi-dropdown-item:hover {
+ background: #f3f3f3;
+}
+.dm-multi-dropdown-item.dm-selected {
+ background: #e5f1fb;
+ font-weight: 600;
 }
