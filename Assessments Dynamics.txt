@@ -1,0 +1,245 @@
+“Assessments” dropddown
+Aberrometry
+Adverse Event(s)
+Autorefractometry
+Axial Length
+Axis Orientation
+Baseline Characteristics
+Best Corrected Distance Visual Acuity (BCDVA)
+Best Corrected Intermediate Visual Acuity (BCIVA)
+Best Corrected Near Visual Acuity (BCNVA)
+Best Corrected Visual Acuity (BCVA)
+Biometry
+Biomicroscopy
+Canadian Dry Eye Epidemiology Study (CANDEES)
+Nd:YAG capsulotomy
+Cataract Grading 
+Conjunctival Staining 
+Contact Lens Corrected Distance Visual Acuity (CLCDVA)
+Contact Lens Dry Eye Questionnaire (CLDEQ)
+Continuous Wear Duration
+Contrast Sensitivity
+Corneal Topography
+Cycloplegic Refraction
+Defocus Curve
+Demographics
+Device Deficiency
+Digital Device Use
+Distance Corrected Intermediate Visual Acuity (DCIVA)
+Distance Corrected Near Visual Acuity (DCNVA)
+Distance Corrected Visual Acuity (DCVA)
+Dry Eye Drops Usage
+Dry Eye Questionnaire (DEQ)
+Dry Eye Screening for Dry Eye Epidemiology Projects (DEEP)
+ECP Rating on Ease of Fit
+ePRO
+Exposure
+Fundus Examination
+Gonioscopy
+Habitual History
+History of Primary Diagnosis
+Horizontal Visible Iris Diameter (HVID) 
+Hours of Digital Use Per Day
+Impact of Dry Eye in Everyday Life (IDEEL)
+Inclusion / Exclusion Criteria
+Informed Consent
+Intraocular Lens Satisfaction (IOLSAT)
+Intraocular Pressure
+IOL Information
+IOL Observations
+IOL Position (Tilt and Centration)
+IP Dispense
+Keratometry
+Lens Fit Assessments
+Lens Oscillation
+Lens Rotational Recovery
+Lens Settling Time
+Lens Surface Assessments (Wettabiity, Deposits)
+Lens Wear Time 
+Lissamine Green Circumlimbal Conjunctival Staining
+Manifest Refraction
+McCarty Symptom Questionnaire
+McMonnies Questionnaire
+Medical History and Concomitant Medications
+Meibomian Gland Functionality Assessment
+Misallocation
+National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)
+Non-Invasive Keratography Break-Up Time (NIKBUT)
+Non-Invasive Tear Break-Up Time (NITBUT)
+Number of Lenses for Successful Fit
+Objective Refraction
+Ocular Comfort Index (OCI)
+Ocular Hypotensive Medications
+Ocular Surface Disease Index (OSDI)
+Optical Coherence Tomography (OCT)
+Optional Assessments
+Pachymetry
+Physical Examination (Targeted)
+Posterior Capsule Opacification
+Pregnancy Test
+Pupil Size
+Quality of Vision (QoV)
+Questionnaire for Visual Disturbances (QUVID)
+Range of Vision
+Reading Speed
+Rewetting Drop Usage
+Schein Questionnaire
+Scribe Mark Visibility
+Slit Lamp Examination
+Standard Patient Evaluation of Eye Dryness Questionnaire (SPEED)
+Stereopsis Test
+Study Lens Power
+Subject Diary
+Subjective Likert Questionnaire (5-Point Scale)
+Subjective Ratings
+Subjective Ratings (1-10 Scale)
+Symptom Assessment In Dry Eye (SANDE)
+Symptomatology Questionnaire
+Symptoms, Problems, and Complaints
+Tear Meniscus Height
+Texas Eye Research and Technology Center Dry Eye Questionnaire (TERTC-DEQ)
+Time to Questionnaire Completion
+Uncorrected Distance Visual Acuity (UCDVA)
+Uncorrected Intermediate Visual Acuity (UCIVA)
+Uncorrected Near Visual Acuity (UCNVA)
+Uncorrected Visual Acuity (UCVA)
+Unplanned Lens Replacment
+Vision Stability with Blink 
+Visual Acuity
+Visual Analog Scale (VAS) 
+Visual Blur Profile
+Visual Field Test
+Vital Signs
+Surgical Report
+Depth of Focus
+Severity Score
+Secondary Surgical Interventions
+Anterior Chamber Depth
+Target Residual Refractive Error
+Predicted Residual Astigmatism
+Stimulus-Based Subjective Questions
+Real-World Subjective Questions
+Randomization
+
+
+“Assessments” selections that should have the “Eye” dropdown
+Aberrometry
+Autorefractometry
+Axial Length
+Axis Orientation
+Biometry
+Nd:YAG capsulotomy
+Cataract Grading 
+Conjunctival Staining 
+Continuous Wear Duration
+Corneal Topography
+Device Deficiency
+Dry Eye Drops Usage
+Dry Eye Questionnaire (DEQ)
+Dry Eye Screening for Dry Eye Epidemiology Projects (DEEP)
+ECP Rating on Ease of Fit
+Fundus Examination
+Gonioscopy
+History of Primary Diagnosis
+Horizontal Visible Iris Diameter (HVID) 
+Impact of Dry Eye in Everyday Life (IDEEL)
+Intraocular Lens Satisfaction (IOLSAT)
+Intraocular Pressure
+IOL Information
+IOL Observations
+IOL Position (Tilt and Centration)
+Keratometry
+Lens Oscillation
+Lens Rotational Recovery
+Lens Settling Time
+Lens Surface Assessments (Wettabiity, Deposits)
+Lens Wear Time 
+Lissamine Green Circumlimbal Conjunctival Staining
+McCarty Symptom Questionnaire
+McMonnies Questionnaire
+Meibomian Gland Functionality Assessment
+National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)
+Non-Invasive Keratography Break-Up Time (NIKBUT)
+Non-Invasive Tear Break-Up Time (NITBUT)
+Number of Lenses for Successful Fit
+Ocular Comfort Index (OCI)
+Ocular Surface Disease Index (OSDI)
+Optical Coherence Tomography (OCT)
+Pachymetry
+Posterior Capsule Opacification
+Pupil Size
+Quality of Vision (QoV)
+Questionnaire for Visual Disturbances (QUVID)
+Rewetting Drop Usage
+Schein Questionnaire
+Scribe Mark Visibility
+Standard Patient Evaluation of Eye Dryness Questionnaire (SPEED)
+Stereopsis Test
+Study Lens Power
+Symptom Assessment In Dry Eye (SANDE)
+Tear Meniscus Height
+Texas Eye Research and Technology Center Dry Eye Questionnaire (TERTC-DEQ)
+Unplanned Lens Replacment
+Vision Stability with Blink 
+Visual Blur Profile
+Surgical Report
+Secondary Surgical Interventions
+Anterior Chamber Depth
+Target Residual Refractive Error
+Predicted Residual Astigmatism
+Stimulus-Based Subjective Questions
+Real-World Subjective Questions
+Randomization
+
+Visual Acuity based Assessments [Best Corrected Distance Visual Acuity (BCDVA)
+Best Corrected Intermediate Visual Acuity (BCIVA)
+Best Corrected Near Visual Acuity (BCNVA)
+Best Corrected Visual Acuity (BCVA)
+Contact Lens Corrected Distance Visual Acuity (CLCDVA)
+Distance Corrected Intermediate Visual Acuity (DCIVA)
+Distance Corrected Near Visual Acuity (DCNVA)
+Distance Corrected Visual Acuity (DCVA)
+Uncorrected Distance Visual Acuity (UCDVA)
+Uncorrected Intermediate Visual Acuity (UCIVA)
+Uncorrected Near Visual Acuity (UCNVA)
+Uncorrected Visual Acuity (UCVA)] that should have the following dropdowns in the same order:
+
+Correction
+(with Habitual Correction,
+ with Habitual Lens,
+ with Study Lenses,
+ with Study Lenses and Over-Spectacles,
+with Over Refraction,
+with Manifest Refraction,
+with Autorefraction), 
+Eye (
+(OD),
+(OS),
+(OU),
+(Study Eye),
+(Monocular),
+(Binocular),
+(OD/OS),
+(OD/OS/OU),
+), 
+Notation (Snellen,
+logMAR,
+Decimal,
+Letters Read), 
+Distance (
+6m,
+4m,
+2m,
+1m,
+120cm,
+66cm,
+60cm,
+40cm,
+33cm
+), 
+Lighting (Photopic,
+Mesopic,
+Scotopic,
+Bright Light), 
+Contrast (High Contrast,
+Low Contrast)
