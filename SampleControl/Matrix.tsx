@@ -15,6 +15,8 @@ type AssessmentMeta = {
  BioSlitSpecify?: string;
  BioSlitMetadata?: string[];
  HabitualMetadata?: string[];
+ RefractionAllThatApply?: string[];
+ RefractionMetadata?: string[];
 };
 type TablePayload = {
  Columns: string[];
@@ -347,6 +349,28 @@ const HABITUAL_METADATA: string[] = [
 "wear success"
 ]
 
+const REFRACTION_ASSESSMENTS: string[] = [
+"Manifest Refraction (MRSE)",
+"Cycloplegic Refraction",
+"Objective Refraction"
+]
+
+const REFRACTION_ALL_THAT_APPLY: string [] = [
+"Pre-fogging",
+"Post-fogging",
+"Jackson Cross Cylinder (JCC)",
+"Duochrome (Red-Green)",
+"Alternate Occlusion",
+"with Binocular Balancing (Prism)"
+]
+
+const REFRACTION_METADATA: string [] = [
+"Sphere",
+"Cylinder",
+"Axis",
+"ADD Power"
+]
+
 
 const hasEyeDropdown = (name?: string): boolean =>
  !!name && (ASSESSMENTS_WITH_EYE.includes(name) || VISUAL_ACUITY_ASSESSMENTS.includes(name));
@@ -356,11 +380,14 @@ const isBioSlitAssessment = (name?: string): boolean =>
  !!name && BIO_SLIT_ASSESSMENTS.includes(name);
 const isHabitualAssessment = (name?: string): boolean =>
  !!name && HABITUAL_ASSESSMENTS.includes(name);
+const isRefractionAssessment = (name?: string): boolean =>
+ !!name && REFRACTION_ASSESSMENTS.includes(name);
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
  const parts: string[] = [];
  // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
+
  if (meta.Eye) parts.push(meta.Eye);
  if (meta.BioSlitSpecify) parts.push(meta.BioSlitSpecify);
  if (meta.Correction) parts.push(meta.Correction);
