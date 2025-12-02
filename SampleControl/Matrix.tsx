@@ -12,12 +12,15 @@ type AssessmentMeta = {
  Distance?: string;
  Lighting?: string;
  Contrast?: string;
+ BioSlitSpecify?: string;
+ BioSlitMetadata?: string[];
 };
 type TablePayload = {
  Columns: string[];
  Rows: Row[];
  VisitMeta?: VisitMeta[];
  AssessmentMeta?: AssessmentMeta[];
+ AssessmentNames?: string[]; 
 };
 export type MatrixProps = {
  initialJson?: string;
@@ -276,16 +279,38 @@ const CONTRAST_OPTIONS: string[] = [
  "High Contrast",
  "Low Contrast"
 ];
+
+// Bio-Slit assessments
+const BIO_SLIT_ASSESSMENTS: string[] = [
+ "Biomicroscopy",
+ "Slit Lamp Examination"
+];
+const BIO_SLIT_SPECIFY_OPTIONS: string[] = [
+ "Change in corneal size",
+ "Corneal Haze",
+ "Epithelial Defect"
+];
+const BIO_SLIT_METADATA_OPTIONS: string[] = [
+ "Anterior Capsule Phemosis",
+ "Anterior Chamber Cells",
+ "Anterior Chamber Flare",
+ "Arcus Lipoides"
+];
+
+
 const hasEyeDropdown = (name?: string): boolean =>
  !!name && (ASSESSMENTS_WITH_EYE.includes(name) || VISUAL_ACUITY_ASSESSMENTS.includes(name));
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
+const isBioSlitAssessment = (name?: string): boolean =>
+ !!name && BIO_SLIT_ASSESSMENTS.includes(name);
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
  const parts: string[] = [];
  // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
  if (meta.Eye) parts.push(meta.Eye);
+ if (meta.BioSlitSpecify) parts.push(meta.BioSlitSpecify);
  if (meta.Correction) parts.push(meta.Correction);
  if (meta.Notation) parts.push(meta.Notation);
  if (meta.Distance) parts.push(meta.Distance);
@@ -309,7 +334,8 @@ const DEFAULT_TABLE: TablePayload = {
  Columns: DEFAULT_COLUMNS,
  Rows: DEFAULT_ROWS,
  VisitMeta: [],
- AssessmentMeta: []
+ AssessmentMeta: [],
+ AssessmentNames: []
 };
 function normalizePayload(obj: Partial<TablePayload>): TablePayload {
  const cols = Array.isArray(obj.Columns) && obj.Columns.length > 0 ? obj.Columns : DEFAULT_COLUMNS;
@@ -328,11 +354,14 @@ function normalizePayload(obj: Partial<TablePayload>): TablePayload {
  }));
  const visitMeta = Array.isArray(obj.VisitMeta) ? obj.VisitMeta : [];
  const assessmentMeta = Array.isArray(obj.AssessmentMeta) ? obj.AssessmentMeta : [];
+ const assessmentNames = Array.isArray(obj.AssessmentNames) ? obj.AssessmentNames : undefined;
+
  return {
    Columns: cols,
    Rows: normRows,
    VisitMeta: visitMeta,
-   AssessmentMeta: assessmentMeta
+   AssessmentMeta: assessmentMeta,
+  AssessmentNames: assessmentNames
  };
 }
 function parsePayload(raw?: string): TablePayload {
@@ -365,15 +394,19 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
    setAssessmentMeta(parsed.AssessmentMeta || []);
  }, [initialJson]);
  // push changes outward
- React.useEffect(() => {
-   const payload: TablePayload = {
-     Columns: columns,
-     Rows: rows,
-     VisitMeta: visitMeta,
-     AssessmentMeta: assessmentMeta
-   };
-   onChange(JSON.stringify(payload));
- }, [columns, rows, visitMeta, assessmentMeta, onChange]);
+React.useEffect(() => {
+ const assessmentNames = assessmentMeta
+   .map(m => m.AssessmentName)
+   .filter((x): x is string => !!x);
+ const payload: TablePayload = {
+   Columns: columns,
+   Rows: rows,
+   VisitMeta: visitMeta,
+   AssessmentMeta: assessmentMeta,
+   AssessmentNames: assessmentNames
+ };
+ onChange(JSON.stringify(payload));
+}, [columns, rows, visitMeta, assessmentMeta, onChange]);
  // --- basic table operations ---
  const addColumn = () => {
    const newColName = "";
@@ -479,7 +512,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        Notation: undefined,
        Distance: undefined,
        Lighting: undefined,
-       Contrast: undefined
+       Contrast: undefined,
+       BioSlitSpecify: undefined,
+       BioSlitMetadata: []
      };
    }
    arr[index] = updated;
@@ -563,6 +598,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const am = assessmentMeta[pane.index] || {};
      const showEye = hasEyeDropdown(am.AssessmentName);
      const isVA = isVisualAcuityAssessment(am.AssessmentName);
+     const isBioSlit = isBioSlitAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -676,6 +712,52 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </div>
 </>
            )}
+
+     {isBioSlit && (
+<>
+   {/* Specify (single-select, goes into header) */}
+<div className="dm-pane-field">
+<label>Specify</label>
+<select
+       value={am.BioSlitSpecify ?? ""}
+       onChange={e => updateAssessmentMeta(pane.index, { BioSlitSpecify: e.target.value })}
+>
+<option value=""></option>
+       {BIO_SLIT_SPECIFY_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+   {/* Metadata (multi-select, checkboxes, NOT in header) */}
+<div className="dm-pane-field">
+<label>Metadata</label>
+<div className="dm-multiselect">
+       {BIO_SLIT_METADATA_OPTIONS.map(opt => {
+         const selected = (am.BioSlitMetadata || []).includes(opt);
+         return (
+<label key={opt} className="dm-multiselect-item">
+<input
+               type="checkbox"
+               checked={selected}
+               onChange={() => {
+                 const current = am.BioSlitMetadata || [];
+                 const exists = current.includes(opt);
+                 const next = exists
+                   ? current.filter(x => x !== opt)
+                   : [...current, opt];
+                 updateAssessmentMeta(pane.index, { BioSlitMetadata: next });
+               }}
+             />
+             {opt}
+</label>
+         );
+       })}
+</div>
+</div>
+</>
+)}      
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
                Save & Close
