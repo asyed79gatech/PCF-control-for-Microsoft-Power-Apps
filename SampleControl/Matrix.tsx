@@ -14,6 +14,7 @@ type AssessmentMeta = {
  Contrast?: string;
  BioSlitSpecify?: string;
  BioSlitMetadata?: string[];
+ HabitualMetadata?: string[];
 };
 type TablePayload = {
  Columns: string[];
@@ -148,7 +149,8 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Predicted Residual Astigmatism",
  "Stimulus-Based Subjective Questions",
  "Real-World Subjective Questions",
- "Randomization"
+ "Randomization",
+ "Habitual Lens Usage"
 ];
 const ASSESSMENTS_WITH_EYE: string[] = [
  "Aberrometry",
@@ -250,7 +252,8 @@ const EYE_OPTIONS: string[] = [
  "Monocular",
  "Binocular",
  "OD/OS",
- "OD/OS/OU"
+ "OD/OS/OU",
+ "(Fellow Eye)"
 ];
 const NOTATION_OPTIONS: string[] = [
  "Snellen",
@@ -286,16 +289,63 @@ const BIO_SLIT_ASSESSMENTS: string[] = [
  "Slit Lamp Examination"
 ];
 const BIO_SLIT_SPECIFY_OPTIONS: string[] = [
- "Change in corneal size",
- "Corneal Haze",
- "Epithelial Defect"
+ "(Change in Corneal Signs)",
+ "(Corneal Haze)",
+ "(Epithelial Defect)",
+ "(Epithelial Ingrowth)",
+ "(Lens Opacification)",
+ "(Retroillumination)",
+ "(Targeted)",
+ "(Posterior capsule opacification)",
+ "(Posterior capsulotomy evaluation)"
+
 ];
 const BIO_SLIT_METADATA_OPTIONS: string[] = [
- "Anterior Capsule Phemosis",
- "Anterior Chamber Cells",
- "Anterior Chamber Flare",
- "Arcus Lipoides"
+"Anterior capsule phimosis",
+"Anterior Chamber Cells",
+"Anterior Chamber Flare",
+"Anterior Chamber Synechiae",
+"Arcus Lipoides",
+"Bulbar Redness",
+"Chemosis",
+"Conjunctiva",
+"Conjunctival Compression/Indentation",
+"Conjunctival Edema",
+"Conjunctival Hyperemia",
+"Conjunctival Staining",
+"Cornea",
+"Corneal Edema",
+"Corneal Epithelial Edema",
+"Corneal Infiltrates",
+"Corneal Staining",
+"Corneal Stromal Edema",
+"Corneal Vascularization",
+"Keratic Precipitates",
+"Lens Opacity",
+"Lens Status",
+"Lids",
+"Limbal Hyperemia",
+"Microbial Keratitis",
+"Neovascularization and Stromal Haze",
+"Palpebral Conjunctival",
+"Posterior Chamber Synechiae",
+"Rueosis Iridis",
+"Subconjunctival Hemorrhage"
 ];
+
+// Habitual Assessments
+const HABITUAL_ASSESSMENTS: string[] = [
+  "Habitual Lens Usage"
+];
+
+const HABITUAL_METADATA: string[] = [
+"brand",
+"lens care brand",
+"manufacturer",
+"modality",
+"power",
+"wear success"
+]
 
 
 const hasEyeDropdown = (name?: string): boolean =>
@@ -304,6 +354,8 @@ const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
 const isBioSlitAssessment = (name?: string): boolean =>
  !!name && BIO_SLIT_ASSESSMENTS.includes(name);
+const isHabitualAssessment = (name?: string): boolean =>
+ !!name && HABITUAL_ASSESSMENTS.includes(name);
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
@@ -514,7 +566,8 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        Lighting: undefined,
        Contrast: undefined,
        BioSlitSpecify: undefined,
-       BioSlitMetadata: []
+       BioSlitMetadata: [],
+       HabitualMetadata: []
      };
    }
    arr[index] = updated;
@@ -599,6 +652,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const showEye = hasEyeDropdown(am.AssessmentName);
      const isVA = isVisualAcuityAssessment(am.AssessmentName);
      const isBioSlit = isBioSlitAssessment(am.AssessmentName);
+     const isHabitual = isHabitualAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -757,7 +811,39 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </div>
 </div>
 </>
-)}      
+)}
+
+     {isHabitual && (
+<>
+   {/* Metadata for Habiutal (multi-select, checkboxes, NOT in header) */}
+<div className="dm-pane-field">
+<label>Metadata</label>
+<div className="dm-multiselect">
+       {HABITUAL_METADATA.map(opt => {
+         const selected = (am.HabitualMetadata || []).includes(opt);
+         return (
+<label key={opt} className="dm-multiselect-item">
+<input
+               type="checkbox"
+               checked={selected}
+               onChange={() => {
+                 const current = am.HabitualMetadata || [];
+                 const exists = current.includes(opt);
+                 const next = exists
+                   ? current.filter(x => x !== opt)
+                   : [...current, opt];
+                 updateAssessmentMeta(pane.index, { HabitualMetadata: next });
+               }}
+             />
+             {opt}
+</label>
+         );
+       })}
+</div>
+</div>
+</>
+)}    
+
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
                Save & Close
