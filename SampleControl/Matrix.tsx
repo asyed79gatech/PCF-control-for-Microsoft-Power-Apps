@@ -6,6 +6,12 @@ type VisitMeta = {
 };
 type AssessmentMeta = {
  AssessmentName?: string;
+ Eye?: string;
+ Correction?: string;
+ Notation?: string;
+ Distance?: string;
+ Lighting?: string;
+ Contrast?: string;
 };
 type TablePayload = {
  Columns: string[];
@@ -17,6 +23,283 @@ export type MatrixProps = {
  initialJson?: string;
  onChange: (json: string) => void;
 };
+// ---------- CONSTANTS ----------
+const ASSESSMENT_OPTIONS: string[] = [
+ "Aberrometry",
+ "Adverse Event(s)",
+ "Autorefractometry",
+ "Axial Length",
+ "Axis Orientation",
+ "Baseline Characteristics",
+ "Best Corrected Distance Visual Acuity (BCDVA)",
+ "Best Corrected Intermediate Visual Acuity (BCIVA)",
+ "Best Corrected Near Visual Acuity (BCNVA)",
+ "Best Corrected Visual Acuity (BCVA)",
+ "Biometry",
+ "Biomicroscopy",
+ "Canadian Dry Eye Epidemiology Study (CANDEES)",
+ "Nd:YAG capsulotomy",
+ "Cataract Grading",
+ "Conjunctival Staining",
+ "Contact Lens Corrected Distance Visual Acuity (CLCDVA)",
+ "Contact Lens Dry Eye Questionnaire (CLDEQ)",
+ "Continuous Wear Duration",
+ "Contrast Sensitivity",
+ "Corneal Topography",
+ "Cycloplegic Refraction",
+ "Defocus Curve",
+ "Demographics",
+ "Device Deficiency",
+ "Digital Device Use",
+ "Distance Corrected Intermediate Visual Acuity (DCIVA)",
+ "Distance Corrected Near Visual Acuity (DCNVA)",
+ "Distance Corrected Visual Acuity (DCVA)",
+ "Dry Eye Drops Usage",
+ "Dry Eye Questionnaire (DEQ)",
+ "Dry Eye Screening for Dry Eye Epidemiology Projects (DEEP)",
+ "ECP Rating on Ease of Fit",
+ "ePRO",
+ "Exposure",
+ "Fundus Examination",
+ "Gonioscopy",
+ "Habitual History",
+ "History of Primary Diagnosis",
+ "Horizontal Visible Iris Diameter (HVID)",
+ "Hours of Digital Use Per Day",
+ "Impact of Dry Eye in Everyday Life (IDEEL)",
+ "Inclusion / Exclusion Criteria",
+ "Informed Consent",
+ "Intraocular Lens Satisfaction (IOLSAT)",
+ "Intraocular Pressure",
+ "IOL Information",
+ "IOL Observations",
+ "IOL Position (Tilt and Centration)",
+ "IP Dispense",
+ "Keratometry",
+ "Lens Fit Assessments",
+ "Lens Oscillation",
+ "Lens Rotational Recovery",
+ "Lens Settling Time",
+ "Lens Surface Assessments (Wettabiity, Deposits)",
+ "Lens Wear Time",
+ "Lissamine Green Circumlimbal Conjunctival Staining",
+ "Manifest Refraction",
+ "McCarty Symptom Questionnaire",
+ "McMonnies Questionnaire",
+ "Medical History and Concomitant Medications",
+ "Meibomian Gland Functionality Assessment",
+ "Misallocation",
+ "National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)",
+ "Non-Invasive Keratography Break-Up Time (NIKBUT)",
+ "Non-Invasive Tear Break-Up Time (NITBUT)",
+ "Number of Lenses for Successful Fit",
+ "Objective Refraction",
+ "Ocular Comfort Index (OCI)",
+ "Ocular Hypotensive Medications",
+ "Ocular Surface Disease Index (OSDI)",
+ "Optical Coherence Tomography (OCT)",
+ "Optional Assessments",
+ "Pachymetry",
+ "Physical Examination (Targeted)",
+ "Posterior Capsule Opacification",
+ "Pregnancy Test",
+ "Pupil Size",
+ "Quality of Vision (QoV)",
+ "Questionnaire for Visual Disturbances (QUVID)",
+ "Range of Vision",
+ "Reading Speed",
+ "Rewetting Drop Usage",
+ "Schein Questionnaire",
+ "Scribe Mark Visibility",
+ "Slit Lamp Examination",
+ "Standard Patient Evaluation of Eye Dryness Questionnaire (SPEED)",
+ "Stereopsis Test",
+ "Study Lens Power",
+ "Subject Diary",
+ "Subjective Likert Questionnaire (5-Point Scale)",
+ "Subjective Ratings",
+ "Subjective Ratings (1-10 Scale)",
+ "Symptom Assessment In Dry Eye (SANDE)",
+ "Symptomatology Questionnaire",
+ "Symptoms, Problems, and Complaints",
+ "Tear Meniscus Height",
+ "Texas Eye Research and Technology Center Dry Eye Questionnaire (TERTC-DEQ)",
+ "Time to Questionnaire Completion",
+ "Uncorrected Distance Visual Acuity (UCDVA)",
+ "Uncorrected Intermediate Visual Acuity (UCIVA)",
+ "Uncorrected Near Visual Acuity (UCNVA)",
+ "Uncorrected Visual Acuity (UCVA)",
+ "Unplanned Lens Replacment",
+ "Vision Stability with Blink",
+ "Visual Acuity",
+ "Visual Analog Scale (VAS)",
+ "Visual Blur Profile",
+ "Visual Field Test",
+ "Vital Signs",
+ "Surgical Report",
+ "Depth of Focus",
+ "Severity Score",
+ "Secondary Surgical Interventions",
+ "Anterior Chamber Depth",
+ "Target Residual Refractive Error",
+ "Predicted Residual Astigmatism",
+ "Stimulus-Based Subjective Questions",
+ "Real-World Subjective Questions",
+ "Randomization"
+];
+const ASSESSMENTS_WITH_EYE: string[] = [
+ "Aberrometry",
+ "Autorefractometry",
+ "Axial Length",
+ "Axis Orientation",
+ "Biometry",
+ "Nd:YAG capsulotomy",
+ "Cataract Grading",
+ "Conjunctival Staining",
+ "Continuous Wear Duration",
+ "Corneal Topography",
+ "Device Deficiency",
+ "Dry Eye Drops Usage",
+ "Dry Eye Questionnaire (DEQ)",
+ "Dry Eye Screening for Dry Eye Epidemiology Projects (DEEP)",
+ "ECP Rating on Ease of Fit",
+ "Fundus Examination",
+ "Gonioscopy",
+ "History of Primary Diagnosis",
+ "Horizontal Visible Iris Diameter (HVID)",
+ "Impact of Dry Eye in Everyday Life (IDEEL)",
+ "Intraocular Lens Satisfaction (IOLSAT)",
+ "Intraocular Pressure",
+ "IOL Information",
+ "IOL Observations",
+ "IOL Position (Tilt and Centration)",
+ "Keratometry",
+ "Lens Oscillation",
+ "Lens Rotational Recovery",
+ "Lens Settling Time",
+ "Lens Surface Assessments (Wettabiity, Deposits)",
+ "Lens Wear Time",
+ "Lissamine Green Circumlimbal Conjunctival Staining",
+ "McCarty Symptom Questionnaire",
+ "McMonnies Questionnaire",
+ "Meibomian Gland Functionality Assessment",
+ "National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)",
+ "Non-Invasive Keratography Break-Up Time (NIKBUT)",
+ "Non-Invasive Tear Break-Up Time (NITBUT)",
+ "Number of Lenses for Successful Fit",
+ "Ocular Comfort Index (OCI)",
+ "Ocular Surface Disease Index (OSDI)",
+ "Optical Coherence Tomography (OCT)",
+ "Pachymetry",
+ "Posterior Capsule Opacification",
+ "Pupil Size",
+ "Quality of Vision (QoV)",
+ "Questionnaire for Visual Disturbances (QUVID)",
+ "Rewetting Drop Usage",
+ "Schein Questionnaire",
+ "Scribe Mark Visibility",
+ "Standard Patient Evaluation of Eye Dryness Questionnaire (SPEED)",
+ "Stereopsis Test",
+ "Study Lens Power",
+ "Symptom Assessment In Dry Eye (SANDE)",
+ "Tear Meniscus Height",
+ "Texas Eye Research and Technology Center Dry Eye Questionnaire (TERTC-DEQ)",
+ "Unplanned Lens Replacment",
+ "Vision Stability with Blink",
+ "Visual Blur Profile",
+ "Surgical Report",
+ "Secondary Surgical Interventions",
+ "Anterior Chamber Depth",
+ "Target Residual Refractive Error",
+ "Predicted Residual Astigmatism",
+ "Stimulus-Based Subjective Questions",
+ "Real-World Subjective Questions",
+ "Randomization"
+];
+const VISUAL_ACUITY_ASSESSMENTS: string[] = [
+ "Best Corrected Distance Visual Acuity (BCDVA)",
+ "Best Corrected Intermediate Visual Acuity (BCIVA)",
+ "Best Corrected Near Visual Acuity (BCNVA)",
+ "Best Corrected Visual Acuity (BCVA)",
+ "Contact Lens Corrected Distance Visual Acuity (CLCDVA)",
+ "Distance Corrected Intermediate Visual Acuity (DCIVA)",
+ "Distance Corrected Near Visual Acuity (DCNVA)",
+ "Distance Corrected Visual Acuity (DCVA)",
+ "Uncorrected Distance Visual Acuity (UCDVA)",
+ "Uncorrected Intermediate Visual Acuity (UCIVA)",
+ "Uncorrected Near Visual Acuity (UCNVA)",
+ "Uncorrected Visual Acuity (UCVA)"
+];
+const CORRECTION_OPTIONS: string[] = [
+ "with Habitual Correction",
+ "with Habitual Lens",
+ "with Study Lenses",
+ "with Study Lenses and Over-Spectacles",
+ "with Over Refraction",
+ "with Manifest Refraction",
+ "with Autorefraction"
+];
+const EYE_OPTIONS: string[] = [
+ "OD",
+ "OS",
+ "OU",
+ "Study Eye",
+ "Monocular",
+ "Binocular",
+ "OD/OS",
+ "OD/OS/OU"
+];
+const NOTATION_OPTIONS: string[] = [
+ "Snellen",
+ "logMAR",
+ "Decimal",
+ "Letters Read"
+];
+const DISTANCE_OPTIONS: string[] = [
+ "6m",
+ "4m",
+ "2m",
+ "1m",
+ "120cm",
+ "66cm",
+ "60cm",
+ "40cm",
+ "33cm"
+];
+const LIGHTING_OPTIONS: string[] = [
+ "Photopic",
+ "Mesopic",
+ "Scotopic",
+ "Bright Light"
+];
+const CONTRAST_OPTIONS: string[] = [
+ "High Contrast",
+ "Low Contrast"
+];
+const hasEyeDropdown = (name?: string): boolean =>
+ !!name && (ASSESSMENTS_WITH_EYE.includes(name) || VISUAL_ACUITY_ASSESSMENTS.includes(name));
+const isVisualAcuityAssessment = (name?: string): boolean =>
+ !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
+
+const formatAssessmentHeader = (meta: AssessmentMeta): string => {
+ if (!meta.AssessmentName) return "";
+ const parts: string[] = [];
+ // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
+ if (meta.Eye) parts.push(meta.Eye);
+ if (meta.Correction) parts.push(meta.Correction);
+ if (meta.Notation) parts.push(meta.Notation);
+ if (meta.Distance) parts.push(meta.Distance);
+ if (meta.Lighting) parts.push(meta.Lighting);
+ if (meta.Contrast) parts.push(meta.Contrast);
+ if (parts.length === 0) {
+   return meta.AssessmentName;
+ }
+ // "AssessmentName Eye, Correction, Notation, Distance, Lighting, Contrast"
+ return `${meta.AssessmentName} ${parts.join(", ")}`;
+};
+
+
+// ---------- DEFAULT TABLE & PARSING ----------
 const DEFAULT_COLUMNS = ["", ""];
 const DEFAULT_ROWS: Row[] = [
  { RowHeader: "", Cells: ["", ""] },
@@ -37,7 +320,6 @@ function normalizePayload(obj: Partial<TablePayload>): TablePayload {
          Cells: Array.isArray(r.Cells) ? r.Cells : Array(cols.length).fill("")
        }))
      : DEFAULT_ROWS;
- // normalize row cell lengths
  const normRows = rows.map(r => ({
    RowHeader: r.RowHeader ?? "",
    Cells: (r.Cells || []).slice(0, cols.length).concat(
@@ -67,40 +349,22 @@ type PaneState =
  | { mode: "column"; index: number }
  | { mode: "row"; index: number }
  | null;
-
+// ---------- COMPONENT ----------
 export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
-
-  // start with defaults
-
-  const [columns, setColumns] = React.useState<string[]>(DEFAULT_TABLE.Columns);
-
-  const [rows, setRows] = React.useState<Row[]>(DEFAULT_TABLE.Rows);
-
-  const [visitMeta, setVisitMeta] = React.useState<VisitMeta[]>([]);
-
-  const [assessmentMeta, setAssessmentMeta] = React.useState<AssessmentMeta[]>([]);
-
-  const [pane, setPane] = React.useState<PaneState>(null);
-
-  // whenever initialJson changes (e.g., varMatrixJSON loaded from SharePoint),
-
-  // re-hydrate the table state from it
-
-  React.useEffect(() => {
-
-    const parsed = parsePayload(initialJson);
-
-    setColumns(parsed.Columns);
-
-    setRows(parsed.Rows);
-
-    setVisitMeta(parsed.VisitMeta || []);
-
-    setAssessmentMeta(parsed.AssessmentMeta || []);
-
-  }, [initialJson]);
- 
- // keep JSON in sync
+ const [columns, setColumns] = React.useState<string[]>(DEFAULT_TABLE.Columns);
+ const [rows, setRows] = React.useState<Row[]>(DEFAULT_TABLE.Rows);
+ const [visitMeta, setVisitMeta] = React.useState<VisitMeta[]>([]);
+ const [assessmentMeta, setAssessmentMeta] = React.useState<AssessmentMeta[]>([]);
+ const [pane, setPane] = React.useState<PaneState>(null);
+ // hydrate from incoming JSON whenever it changes
+ React.useEffect(() => {
+   const parsed = parsePayload(initialJson);
+   setColumns(parsed.Columns);
+   setRows(parsed.Rows);
+   setVisitMeta(parsed.VisitMeta || []);
+   setAssessmentMeta(parsed.AssessmentMeta || []);
+ }, [initialJson]);
+ // push changes outward
  React.useEffect(() => {
    const payload: TablePayload = {
      Columns: columns,
@@ -110,16 +374,16 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
    };
    onChange(JSON.stringify(payload));
  }, [columns, rows, visitMeta, assessmentMeta, onChange]);
- // --- helpers ------------------------------------------------------
+ // --- basic table operations ---
  const addColumn = () => {
    const newColName = "";
    setColumns(prev => [...prev, newColName]);
    setRows(prev => prev.map(r => ({ ...r, Cells: [...r.Cells, ""] })));
-   setVisitMeta(prev => [...prev, {}]); // keep index aligned
+   setVisitMeta(prev => [...prev, {}]);
  };
  const addRow = () => {
    setRows(prev => [...prev, { RowHeader: "", Cells: Array(columns.length).fill("") }]);
-   setAssessmentMeta(prev => [...prev, {}]); // keep index aligned
+   setAssessmentMeta(prev => [...prev, {}]);
  };
  const removeColumn = (i: number) => {
    setColumns(prev => prev.filter((_, idx) => idx !== i));
@@ -130,19 +394,12 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
      }))
    );
    setVisitMeta(prev => prev.filter((_, idx) => idx !== i));
-   // close pane if it was this column
    setPane(p => (p && p.mode === "column" && p.index === i ? null : p));
  };
  const removeRow = (i: number) => {
    setRows(prev => prev.filter((_, idx) => idx !== i));
    setAssessmentMeta(prev => prev.filter((_, idx) => idx !== i));
    setPane(p => (p && p.mode === "row" && p.index === i ? null : p));
- };
- const renameColumn = (i: number, v: string) => {
-   setColumns(prev => prev.map((c, idx) => (idx === i ? v : c)));
- };
- const renameRow = (i: number, v: string) => {
-   setRows(prev => prev.map((r, idx) => (idx === i ? { ...r, RowHeader: v } : r)));
  };
  const setCell = (rIndex: number, cIndex: number, v: string) => {
    setRows(prev => {
@@ -193,7 +450,6 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
      return arr;
    });
  };
- // visit pane: set dropdowns + update header label
  const updateVisitMeta = (index: number, patch: Partial<VisitMeta>) => {
    setVisitMeta(prev => {
      const arr = [...prev];
@@ -209,23 +465,35 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
      return arr;
    });
  };
- const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => {
-   setAssessmentMeta(prev => {
-     const arr = [...prev];
-     const current = arr[index] || {};
-     const updated: AssessmentMeta = { ...current, ...patch };
-     arr[index] = updated;
-     const headerText = updated.AssessmentName ?? "";
-     setRows(prevRows => {
-       const rowsCopy = [...prevRows];
-       const row = rowsCopy[index] || { RowHeader: "", Cells: Array(columns.length).fill("") };
-       rowsCopy[index] = { ...row, RowHeader: headerText };
-       return rowsCopy;
-     });
-     return arr;
+const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => {
+ setAssessmentMeta(prev => {
+   const arr = [...prev];
+   const current = arr[index] || {};
+   let updated: AssessmentMeta = { ...current, ...patch };
+   // If AssessmentName changed, reset dependent fields
+   if (patch.AssessmentName !== undefined) {
+     updated = {
+       AssessmentName: patch.AssessmentName,
+       Eye: undefined,
+       Correction: undefined,
+       Notation: undefined,
+       Distance: undefined,
+       Lighting: undefined,
+       Contrast: undefined
+     };
+   }
+   arr[index] = updated;
+   const headerText = formatAssessmentHeader(updated);
+   setRows(prevRows => {
+     const rowsCopy = [...prevRows];
+     const row = rowsCopy[index] || { RowHeader: "", Cells: Array(columns.length).fill("") };
+     rowsCopy[index] = { ...row, RowHeader: headerText };
+     return rowsCopy;
    });
- };
- // --- render panes -------------------------------------------------
+   return arr;
+ });
+};
+ // ---------- PANE RENDERING ----------
  const renderPane = () => {
    if (!pane) return null;
    if (pane.mode === "column") {
@@ -293,6 +561,8 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
    }
    if (pane.mode === "row") {
      const am = assessmentMeta[pane.index] || {};
+     const showEye = hasEyeDropdown(am.AssessmentName);
+     const isVA = isVisualAcuityAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -309,12 +579,103 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                onChange={e => updateAssessmentMeta(pane.index, { AssessmentName: e.target.value })}
 >
 <option value=""></option>
-<option value="Adverse Events">Adverse Events</option>
-<option value="Demographics">Demographics</option>
-<option value="Inclusion/ Exclusion Criteria">Inclusion/ Exclusion Criteria</option>
-<option value="Informed Consent">Informed Consent</option>
+               {ASSESSMENT_OPTIONS.map(name => (
+<option key={name} value={name}>
+                   {name}
+</option>
+               ))}
 </select>
 </div>
+           {showEye && (
+<div className="dm-pane-field">
+<label>Eye</label>
+<select
+                 value={am.Eye ?? ""}
+                 onChange={e => updateAssessmentMeta(pane.index, { Eye: e.target.value })}
+>
+<option value=""></option>
+                 {EYE_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                     {opt}
+</option>
+                 ))}
+</select>
+</div>
+           )}
+           {isVA && (
+<>
+<div className="dm-pane-field">
+<label>Correction</label>
+<select
+                   value={am.Correction ?? ""}
+                   onChange={e => updateAssessmentMeta(pane.index, { Correction: e.target.value })}
+>
+<option value=""></option>
+                   {CORRECTION_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                       {opt}
+</option>
+                   ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Notation</label>
+<select
+                   value={am.Notation ?? ""}
+                   onChange={e => updateAssessmentMeta(pane.index, { Notation: e.target.value })}
+>
+<option value=""></option>
+                   {NOTATION_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                       {opt}
+</option>
+                   ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Distance</label>
+<select
+                   value={am.Distance ?? ""}
+                   onChange={e => updateAssessmentMeta(pane.index, { Distance: e.target.value })}
+>
+<option value=""></option>
+                   {DISTANCE_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                       {opt}
+</option>
+                   ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Lighting</label>
+<select
+                   value={am.Lighting ?? ""}
+                   onChange={e => updateAssessmentMeta(pane.index, { Lighting: e.target.value })}
+>
+<option value=""></option>
+                   {LIGHTING_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                       {opt}
+</option>
+                   ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Contrast</label>
+<select
+                   value={am.Contrast ?? ""}
+                   onChange={e => updateAssessmentMeta(pane.index, { Contrast: e.target.value })}
+>
+<option value=""></option>
+                   {CONTRAST_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                       {opt}
+</option>
+                   ))}
+</select>
+</div>
+</>
+           )}
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
                Save & Close
@@ -326,7 +687,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
    }
    return null;
  };
- // --- main render ---------------------------------------------------
+ // ---------- MAIN RENDER ----------
  return (
 <div className="dm-container">
 <div className="dm-toolbar">
@@ -345,37 +706,36 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
              {columns.map((c, i) => (
 <th key={i}>
 <div className="dm-col-header-wrapper">
-     {/* Clicking this input opens the Build Visit pane */}
 <input
-       value={c}
-       readOnly
-       onClick={() => setPane({ mode: "column", index: i })}
-       className="dm-input dm-col-header dm-clickable"
-     />
+                     value={c}
+                     readOnly
+                     onClick={() => setPane({ mode: "column", index: i })}
+                     className="dm-input dm-col-header dm-clickable"
+                   />
 <div className="dm-header-buttons">
 <button
-         type="button"
-         className="dm-small"
-         onClick={() => moveColumn(i, i - 1)}
-         title="Move left"
+                       type="button"
+                       className="dm-small"
+                       onClick={() => moveColumn(i, i - 1)}
+                       title="Move left"
 >
-         ←
+                       ←
 </button>
 <button
-         type="button"
-         className="dm-small"
-         onClick={() => moveColumn(i, i + 1)}
-         title="Move right"
+                       type="button"
+                       className="dm-small"
+                       onClick={() => moveColumn(i, i + 1)}
+                       title="Move right"
 >
-         →
+                       →
 </button>
 <button
-         type="button"
-         className="dm-danger dm-small"
-         onClick={() => removeColumn(i)}
-         title="Delete column"
+                       type="button"
+                       className="dm-danger dm-small"
+                       onClick={() => removeColumn(i)}
+                       title="Delete column"
 >
-         ×
+                       ×
 </button>
 </div>
 </div>
@@ -388,13 +748,12 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
 <tr key={ri}>
 <td>
 <div className="dm-row-head">
-   {/* Clicking this input opens the Build Assessment pane */}
-<input
-     value={r.RowHeader}
-     readOnly
+<div
+     className="dm-row-header-display dm-clickable"
      onClick={() => setPane({ mode: "row", index: ri })}
-     className="dm-input dm-row-header dm-clickable"
-   />
+>
+     {r.RowHeader}
+</div>
 <div className="dm-header-buttons">
 <button
        type="button"

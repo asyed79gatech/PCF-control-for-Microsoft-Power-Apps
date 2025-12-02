@@ -46,7 +46,7 @@
 }
 .dm-row-head {
  display: flex;
- align-items: center;
+ align-items: flex-start;
  gap: 4px;
 }
 .dm-col-header-wrapper {
@@ -124,7 +124,28 @@
 .dm-clickable {
  cursor: pointer;
 }
-.dm-col-header.dm-clickable,
+
 .dm-row-header.dm-clickable {
  background-color: #f3f2f1;
+}
+
+.dm-row-header-display {
+ flex: 1 1 0;          /* allow it to shrink inside the flex row */
+ min-width: 0;         /* CRITICAL: let it be narrower than its content */
+ padding: 4px;
+ min-height: 32px;
+ white-space: normal;  /* wrap normally */
+ word-break: break-word;
+ background: #fff;
+ border: 1px solid #ccc;
+ box-sizing: border-box;
+}
+
+.dm-clickable {
+ cursor: pointer;
+}
+
+.dm-row-head {
+ display: flex;
+ align-items: flex-start;
 }
