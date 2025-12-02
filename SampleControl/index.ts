@@ -2,7 +2,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { Matrix } from "./Matrix";
-export class VisitsAssessments3 implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class VisitsAssessments implements ComponentFramework.StandardControl<IInputs, IOutputs> {
  private _container!: HTMLDivElement;
  private _root: Root | undefined;
  private _notify!: () => void;
@@ -24,3 +24,4 @@ export class VisitsAssessments3 implements ComponentFramework.StandardControl<II
  public getOutputs(): IOutputs { return { tableData: this._json }; }
  public destroy(): void { this._root?.unmount(); }
 }
+
