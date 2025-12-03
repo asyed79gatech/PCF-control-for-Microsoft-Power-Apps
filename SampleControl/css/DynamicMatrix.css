@@ -178,3 +178,60 @@
     color: #e81123;
     border: 1px solid #e81123
 }
+
+
+
+/* Multi-select dropdown shell */
+.dm-multi-dropdown {
+ position: relative;
+ border: 1px solid #ccc;
+ border-radius: 2px;
+ padding: 4px 24px 4px 6px;
+ background: #fff;
+ font-size: 12px;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ min-height: 24px;
+ box-sizing: border-box;
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
+}
+.dm-multi-placeholder {
+ color: #888;
+}
+/* little caret on the right */
+.dm-multi-caret {
+ margin-left: 8px;
+ font-size: 10px;
+}
+/* dropdown menu */
+.dm-multi-dropdown-menu {
+ position: relative;
+ margin-top: 4px;
+ border: 1px solid #ccc;
+ background: #fff;
+ max-height: 160px;
+ overflow-y: auto;
+ box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+ z-index: 20;
+}
+/* each option row */
+.dm-multi-dropdown-option {
+ display: flex !important;
+ align-items: center;
+ justify-content: flex-start;
+ gap: 6px;
+ padding: 3px 6px;
+ font-size: 12px;
+ cursor: pointer;
+ text-align: left !important;
+}
+.dm-multi-dropdown-option input {
+ margin: 0;
+}
+.dm-multi-dropdown-option--selected {
+ background: #f3f2f1;
+}

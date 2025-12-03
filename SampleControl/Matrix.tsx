@@ -29,6 +29,67 @@ export type MatrixProps = {
  initialJson?: string;
  onChange: (json: string) => void;
 };
+
+//-----------Multi-select Dropdown----
+type MultiSelectProps = {
+ label: string;
+ options: string[];
+ selected?: string[];
+ onChange: (next: string[]) => void;
+};
+const MultiSelect: React.FC<MultiSelectProps> = ({
+ label,
+ options,
+ selected = [],
+ onChange
+}) => {
+ const [open, setOpen] = React.useState(false);
+ const toggleOption = (opt: string) => {
+   const exists = selected.includes(opt);
+   const next = exists ? selected.filter(x => x !== opt) : [...selected, opt];
+   onChange(next);
+ };
+ const displayText =
+   selected.length === 0 ? "Select..." : selected.join(", ");
+ return (
+<div className="dm-pane-field">
+<label>{label}</label>
+<div
+       className="dm-multi-dropdown"
+       onClick={() => setOpen(o => !o)}
+>
+<span className={selected.length === 0 ? "dm-multi-placeholder" : ""}>
+         {displayText}
+</span>
+<span className="dm-multi-caret">▾</span>
+</div>
+     {open && (
+<div className="dm-multi-dropdown-menu">
+         {options.map(opt => {
+           const isSelected = selected.includes(opt);
+           return (
+<div
+               key={opt}
+               className={
+                 "dm-multi-dropdown-option" +
+                 (isSelected ? " dm-multi-dropdown-option--selected" : "")
+               }
+               onClick={e => {
+                 e.stopPropagation();
+                 toggleOption(opt);
+               }}
+>
+<input type="checkbox" readOnly checked={isSelected} />
+<span>{opt}</span>
+</div>
+           );
+         })}
+</div>
+     )}
+</div>
+ );
+};
+
 // ---------- CONSTANTS ----------
 const ASSESSMENT_OPTIONS: string[] = [
  "Aberrometry",
@@ -812,62 +873,24 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </select>
 </div>
    {/* Metadata (multi-select, checkboxes, NOT in header) */}
-<div className="dm-pane-field">
-<label>Metadata</label>
-<div className="dm-multiselect">
-       {BIO_SLIT_METADATA_OPTIONS.map(opt => {
-         const selected = (am.BioSlitMetadata || []).includes(opt);
-         return (
-<label key={opt} className="dm-multiselect-item">
-<input
-               type="checkbox"
-               checked={selected}
-               onChange={() => {
-                 const current = am.BioSlitMetadata || [];
-                 const exists = current.includes(opt);
-                 const next = exists
-                   ? current.filter(x => x !== opt)
-                   : [...current, opt];
-                 updateAssessmentMeta(pane.index, { BioSlitMetadata: next });
-               }}
-             />
-             {opt}
-</label>
-         );
-       })}
-</div>
-</div>
+<MultiSelect
+ label="Metadata"
+ options={BIO_SLIT_METADATA_OPTIONS}
+ selected={am.BioSlitMetadata}
+ onChange={next => updateAssessmentMeta(pane.index, { BioSlitMetadata: next })}
+/>
 </>
 )}
 
      {isHabitual && (
 <>
    {/* Metadata for Habiutal (multi-select, checkboxes, NOT in header) */}
-<div className="dm-pane-field">
-<label>Metadata</label>
-<div className="dm-multiselect">
-       {HABITUAL_METADATA.map(opt => {
-         const selected = (am.HabitualMetadata || []).includes(opt);
-         return (
-<label key={opt} className="dm-multiselect-item">
-<input
-               type="checkbox"
-               checked={selected}
-               onChange={() => {
-                 const current = am.HabitualMetadata || [];
-                 const exists = current.includes(opt);
-                 const next = exists
-                   ? current.filter(x => x !== opt)
-                   : [...current, opt];
-                 updateAssessmentMeta(pane.index, { HabitualMetadata: next });
-               }}
-             />
-             {opt}
-</label>
-         );
-       })}
-</div>
-</div>
+<MultiSelect
+ label="Metadata"
+ options={HABITUAL_METADATA}
+ selected={am.HabitualMetadata}
+ onChange={next => updateAssessmentMeta(pane.index, { HabitualMetadata: next })}
+/>
 </>
 )}    
 
