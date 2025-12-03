@@ -150,7 +150,7 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Lens Surface Assessments (Wettabiity, Deposits)",
  "Lens Wear Time",
  "Lissamine Green Circumlimbal Conjunctival Staining",
- "Manifest Refraction",
+ "Manifest Refraction (MRSE)",
  "McCarty Symptom Questionnaire",
  "McMonnies Questionnaire",
  "Medical History and Concomitant Medications",
@@ -434,7 +434,12 @@ const REFRACTION_METADATA: string [] = [
 
 
 const hasEyeDropdown = (name?: string): boolean =>
- !!name && (ASSESSMENTS_WITH_EYE.includes(name) || VISUAL_ACUITY_ASSESSMENTS.includes(name));
+ !!name &&
+ (
+   ASSESSMENTS_WITH_EYE.includes(name) ||
+   VISUAL_ACUITY_ASSESSMENTS.includes(name) ||
+   REFRACTION_ASSESSMENTS.includes(name)      
+ );
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
 const isBioSlitAssessment = (name?: string): boolean =>
@@ -451,6 +456,9 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
 
  if (meta.Eye) parts.push(meta.Eye);
  if (meta.BioSlitSpecify) parts.push(meta.BioSlitSpecify);
+ if(meta.RefractionAllThatApply && meta.RefractionAllThatApply.length) {
+  parts.push(meta.RefractionAllThatApply.join(", "))
+ }
  if (meta.Correction) parts.push(meta.Correction);
  if (meta.Notation) parts.push(meta.Notation);
  if (meta.Distance) parts.push(meta.Distance);
@@ -655,7 +663,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        Contrast: undefined,
        BioSlitSpecify: undefined,
        BioSlitMetadata: [],
-       HabitualMetadata: []
+       HabitualMetadata: [],
+       RefractionAllThatApply: [],
+       RefractionMetadata: []
      };
    }
    arr[index] = updated;
@@ -741,6 +751,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isVA = isVisualAcuityAssessment(am.AssessmentName);
      const isBioSlit = isBioSlitAssessment(am.AssessmentName);
      const isHabitual = isHabitualAssessment(am.AssessmentName);
+     const isRefraction = isRefractionAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -854,6 +865,26 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </div>
 </>
            )}
+
+     {isRefraction && (
+<>
+   {/* (a) Select all that apply - Refraction (multi-select, shows in header) */}
+<MultiSelect
+ label="Select All that Apply"
+ options={REFRACTION_ALL_THAT_APPLY}
+ selected={am.RefractionAllThatApply || []}
+ onChange={next => updateAssessmentMeta(pane.index, { RefractionAllThatApply: next })}
+/>
+   {/* (c) Metadata – multi-select stored in JSON only, not shown in header */}
+   {/* Metadata (multi-select, checkboxes, NOT in header) */}
+<MultiSelect
+ label="Metadata"
+ options={REFRACTION_METADATA}
+ selected={am.RefractionMetadata}
+ onChange={next => updateAssessmentMeta(pane.index, { RefractionMetadata: next })}
+/>
+</>
+)}  
 
      {isBioSlit && (
 <>
