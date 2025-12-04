@@ -30,6 +30,7 @@ type AssessmentMeta = {
  CSLighting?: string,
  CataractMehod?: string,
  CataractParameters?: string [],
+ VFMethod?: string
 };
 
 type TablePayload = {
@@ -573,6 +574,18 @@ const CATARACT_PARAMETERS: string[] = [
 "Vacoles"
 ]
 
+const VF_ASSESSMENTS: string[] = [
+  "Visual Field Test"
+]
+
+const VF_METHODS: string[] = [
+  "(Humphrey Field Analyzer (HFA))",
+"(HS Octopus)",
+"(OCULUS)",
+"(Topcon)"
+]
+
+
 
 
 const hasEyeDropdown = (name?: string): boolean =>
@@ -585,7 +598,8 @@ const hasEyeDropdown = (name?: string): boolean =>
    SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name) ||
    SPC_ASSESSMENTS.includes(name) ||
    CS_ASSESSMNETS.includes(name) ||
-   CATARACT_ASSESSMENTS.includes(name)
+   CATARACT_ASSESSMENTS.includes(name) ||
+   VF_ASSESSMENTS.includes(name)
  );
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
@@ -607,11 +621,14 @@ const isCSAssessment = (name?: string): boolean =>
   !!name && CS_ASSESSMNETS.includes(name)
 const isCataractAssessment = (name?: string): boolean =>
   !!name && CATARACT_ASSESSMENTS.includes(name)
+const isVFAssessment = (name?: string): boolean =>
+  !!name && VF_ASSESSMENTS.includes(name)
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
  const parts: string[] = [];
  // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
+ if(meta.VFMethod) parts.push(meta.VFMethod)
  if (meta.CataractMehod) parts.push(meta.CataractMehod);
  if(meta.CataractParameters && meta.CataractParameters.length) {
   parts.push(meta.CataractParameters.join(", "))
@@ -857,10 +874,11 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        CSMethod: undefined,
        CSMethodCustom: undefined,
        CataractMehod: undefined,
-       CataractParameters: []
-
+       CataractParameters: [],
+       VFMethod: undefined
      };
    }
+
    arr[index] = updated;
    const headerText = formatAssessmentHeader(updated);
    setRows(prevRows => {
@@ -951,6 +969,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isLensFit = isLensFitAssessment(am.AssessmentName);
      const isCS = isCSAssessment(am.AssessmentName);
      const isCataract = isCataractAssessment(am.AssessmentName);
+     const isVF = isVFAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -1335,7 +1354,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 
      {isCataract && (
 <>
-   {/* (a) Subcategory */}
+   {/* (a) Method */}
 <div className="dm-pane-field">
 <label>Method</label>
 <select
@@ -1353,7 +1372,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </select>
 </div>
 
-   {/* (b) Method – select all that apply (multi-select, appears in header) */}
+   {/* (b) Parameters – select all that apply (multi-select, appears in header) */}
 <MultiSelect
      label="Parameters (All that Apply)"
      options={CATARACT_PARAMETERS}
@@ -1363,6 +1382,28 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      }
    />
 
+</>
+)}
+
+     {isVF && (
+<>
+   {/* (a) Method */}
+<div className="dm-pane-field">
+<label>Method</label>
+<select
+       value={am.VFMethod ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { VFMethod: e.target.value })
+       }
+>
+<option value=""></option>
+       {VF_METHODS.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
 </>
 )}
 
