@@ -17,6 +17,8 @@ type AssessmentMeta = {
  HabitualMetadata?: string[];
  RefractionAllThatApply?: string[];
  RefractionMetadata?: string[];
+ ROVMethod?: string[];
+ ROVRange?: string;
 };
 type TablePayload = {
  Columns: string[];
@@ -432,13 +434,27 @@ const REFRACTION_METADATA: string [] = [
 "ADD Power"
 ]
 
+const ROV_ASSESSMENTS: string [] = [
+"Range of Vision",
+"Defocus Curve",
+"Depth of Focus"
+]
+
+
+const ROV_METHOD_OPTIONS = [
+  "Pre-fogging",
+  "Post-fogging",
+  "(Negative Defocus Range Only)"
+]
+
 
 const hasEyeDropdown = (name?: string): boolean =>
  !!name &&
  (
    ASSESSMENTS_WITH_EYE.includes(name) ||
    VISUAL_ACUITY_ASSESSMENTS.includes(name) ||
-   REFRACTION_ASSESSMENTS.includes(name)      
+   REFRACTION_ASSESSMENTS.includes(name) ||
+   ROV_ASSESSMENTS.includes(name)     
  );
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
@@ -448,6 +464,8 @@ const isHabitualAssessment = (name?: string): boolean =>
  !!name && HABITUAL_ASSESSMENTS.includes(name);
 const isRefractionAssessment = (name?: string): boolean =>
  !!name && REFRACTION_ASSESSMENTS.includes(name);
+const isROVAssessment = (name?: string): boolean =>
+  !!name && ROV_ASSESSMENTS.includes(name);
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
@@ -459,6 +477,10 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if(meta.RefractionAllThatApply && meta.RefractionAllThatApply.length) {
   parts.push(meta.RefractionAllThatApply.join(", "))
  }
+ if (meta.ROVMethod && meta.ROVMethod.length) {
+  parts.push(meta.ROVMethod.join(", "));
+ }
+ if(meta.ROVRange) parts.push(meta.ROVRange);
  if (meta.Correction) parts.push(meta.Correction);
  if (meta.Notation) parts.push(meta.Notation);
  if (meta.Distance) parts.push(meta.Distance);
@@ -665,7 +687,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        BioSlitMetadata: [],
        HabitualMetadata: [],
        RefractionAllThatApply: [],
-       RefractionMetadata: []
+       RefractionMetadata: [],
+       ROVMethod: [],
+       ROVRange: undefined
      };
    }
    arr[index] = updated;
@@ -752,6 +776,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isBioSlit = isBioSlitAssessment(am.AssessmentName);
      const isHabitual = isHabitualAssessment(am.AssessmentName);
      const isRefraction = isRefractionAssessment(am.AssessmentName);
+     const isROV = isROVAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -923,7 +948,51 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
  onChange={next => updateAssessmentMeta(pane.index, { HabitualMetadata: next })}
 />
 </>
-)}    
+)}
+
+     {isROV && (
+<>
+   {/* (a) Method – select all that apply (multi-select, appears in header) */}
+<MultiSelect
+     label="Method – Select all that apply"
+     options={ROV_METHOD_OPTIONS}
+     selected={am.ROVMethod || []}
+     onChange={next =>
+       updateAssessmentMeta(pane.index, { ROVMethod: next })
+     }
+   />
+   {/* (c) Enter Range – free text */}
+<div className="dm-pane-field">
+<label>Enter Range</label>
+<input
+       type="text"
+       className="dm-input"
+       placeholder="Ex: -5.00 to +0.25 DS"
+       value={am.ROVRange ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { ROVRange: e.target.value })
+       }
+     />
+</div>
+   {/* (d) Lighting – reuse existing Lighting dropdown */}
+<div className="dm-pane-field">
+<label>Lighting</label>
+<select
+       value={am.Lighting ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { Lighting: e.target.value })
+       }
+>
+<option value=""></option>
+       {LIGHTING_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+</>
+)}
 
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
