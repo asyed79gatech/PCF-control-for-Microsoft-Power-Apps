@@ -23,7 +23,11 @@ type AssessmentMeta = {
  SubjectiveRatingsAllThatApply?: string[];
  SPCMetadata?: string[];
  LensFitSubCat?: string;
- LensFitAllThatApply?: string[]
+ LensFitAllThatApply?: string[],
+ CSMethod?: string,
+ CSMethodCustom?: string,
+ CSCorrection?: string,
+ CSLighting?: string
 };
 type TablePayload = {
  Columns: string[];
@@ -446,13 +450,13 @@ const ROV_ASSESSMENTS: string [] = [
 ]
 
 
-const ROV_METHOD_OPTIONS = [
+const ROV_METHOD_OPTIONS: string[] = [
   "Pre-fogging",
   "Post-fogging",
   "(Negative Defocus Range Only)"
 ]
 
-const SUBJECTIVE_RATINGS_ASSESSMENTS = [
+const SUBJECTIVE_RATINGS_ASSESSMENTS: string [] = [
   "Subjective Likert Questionnaire (5-Point Scale)",
   "Subjective Ratings",
   "Subjective Ratings (1-10 Scale)",
@@ -460,14 +464,14 @@ const SUBJECTIVE_RATINGS_ASSESSMENTS = [
   "Subject Diary"
 ]
 
-const SUBJECTIVE_RATINGS_SUBCAT = [
+const SUBJECTIVE_RATINGS_SUBCAT: string [] = [
 "Agreement",
 "Ocular Comfort",
 "Satisfaction",
 "Preference"
 ]
 
-const SUBJECTIVE_RATINGS_ALL_THAT_APPLY = [
+const SUBJECTIVE_RATINGS_ALL_THAT_APPLY: string[] = [
 "All Day Confort",
 "Corneal Pain",
 "Ease of Insertion",
@@ -485,12 +489,12 @@ const SUBJECTIVE_RATINGS_ALL_THAT_APPLY = [
 "Ghosting"
 ]
 
-const SPC_ASSESSMENTS = [
+const SPC_ASSESSMENTS: string[] = [
 "Symptomatology Questionnaire",
 "Symptoms, Problems, and Complaints"
 ]
 
-const SPC_METADATA_ALL_THAT_APPLY = [
+const SPC_METADATA_ALL_THAT_APPLY: string[] = [
 "Drop Burning",
 "Drop Stinging",
 "Burning",
@@ -510,18 +514,36 @@ const SPC_METADATA_ALL_THAT_APPLY = [
 "Other"
 ]
 
-const LENS_FIT_ASSESSMENTS = [
+const LENS_FIT_ASSESSMENTS: string[] = [
   "Lens Fit Assessments"
 ]
 
-const LENS_FIT_SUBCAT = [
+const LENS_FIT_SUBCAT: string[] = [
   "Primary",
   "Peripheral"
 ]
 
-const LENS_FIT_ALL_THAT_APPLY = [
+const LENS_FIT_ALL_THAT_APPLY: string[] = [
   "Lens movement (overall fit)",
   "Lens position (centration)"
+]
+
+const CS_ASSESSMNETS: string[] = [
+  "Contrast Sensitivity"
+]
+
+const CS_METHOD: string[] = [
+"Pelli-Robson",
+"Small Letter",
+"CSV 1000",
+"Add Custom",
+"Large Letter"
+]
+
+const CS_CORRECTION_OPTIONS: string[] = [
+"Best Corrected",
+"Uncorrected",
+"Corrected"
 ]
 
 const hasEyeDropdown = (name?: string): boolean =>
@@ -532,7 +554,8 @@ const hasEyeDropdown = (name?: string): boolean =>
    REFRACTION_ASSESSMENTS.includes(name) ||
    ROV_ASSESSMENTS.includes(name) ||
    SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name) ||
-   SPC_ASSESSMENTS.includes(name)
+   SPC_ASSESSMENTS.includes(name) ||
+   CS_ASSESSMNETS.includes(name)
  );
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
@@ -550,6 +573,8 @@ const isSPCAssessment = (name?: string): boolean =>
   !!name && SPC_ASSESSMENTS.includes(name)
 const isLensFitAssessment = (name?: string): boolean =>
   !!name && LENS_FIT_ASSESSMENTS.includes(name)
+const isCSAssessment = (name?: string): boolean =>
+  !!name && CS_ASSESSMNETS.includes(name)
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
@@ -568,6 +593,13 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
   parts.push(meta.ROVMethod.join(", "));
  }
  if(meta.ROVRange) parts.push(meta.ROVRange);
+
+ if (meta.CSMethod === "Add Custom" && meta.CSMethodCustom) {
+  // show the custom text instead of the literal "Add Custom"
+  parts.push(meta.CSMethodCustom);
+ } else if (meta.CSMethod) {
+  parts.push(meta.CSMethod);
+ }
  if (meta.Correction) parts.push(meta.Correction);
  if (meta.Notation) parts.push(meta.Notation);
  if (meta.Distance) parts.push(meta.Distance);
@@ -785,7 +817,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        SubjectiveRatingsAllThatApply: [],
        SPCMetadata: [],
        LensFitSubCat: undefined,
-       LensFitAllThatApply: []
+       LensFitAllThatApply: [],
+       CSMethod: undefined,
+       CSMethodCustom: undefined
 
      };
    }
@@ -875,8 +909,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isRefraction = isRefractionAssessment(am.AssessmentName);
      const isROV = isROVAssessment(am.AssessmentName);
      const isSubjective = isSubjectiveAssessment(am.AssessmentName);
-     const isSPC = isSPCAssessment(am.AssessmentName)
-     const isLensFit = isLensFitAssessment(am.AssessmentName)
+     const isSPC = isSPCAssessment(am.AssessmentName);
+     const isLensFit = isLensFitAssessment(am.AssessmentName);
+     const isCS = isCSAssessment(am.AssessmentName)
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -1171,6 +1206,90 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      }
    />
 
+</>
+)}
+
+
+     {isCS && (
+<>
+   {/* 1. Method */}
+<div className="dm-pane-field">
+<label>Method</label>
+<select
+       value={am.CSMethod ?? ""}
+       onChange={e => {
+         const value = e.target.value;
+         // if method changes away from Add Custom, clear custom text
+         if (value !== "Add Custom") {
+           updateAssessmentMeta(pane.index, {
+             CSMethod: value,
+             CSMethodCustom: undefined
+           });
+         } else {
+           updateAssessmentMeta(pane.index, {
+             CSMethod: value
+           });
+         }
+       }}
+>
+<option value=""></option>
+       {CS_METHOD.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+   {/* 2. Custom method text, only when "Add Custom" selected */}
+   {am.CSMethod === "Add Custom" && (
+<div className="dm-pane-field">
+<label>Add Custom</label>
+<input
+         type="text"
+         className="dm-input"
+         placeholder="Enter custom method"
+         value={am.CSMethodCustom ?? ""}
+         onChange={e =>
+           updateAssessmentMeta(pane.index, { CSMethodCustom: e.target.value })
+         }
+       />
+</div>
+   )}
+   {/* 3. Correction (Best Corrected / Uncorrected / Corrected) */}
+<div className="dm-pane-field">
+<label>Correction</label>
+<select
+       value={am.Correction ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { Correction: e.target.value })
+       }
+>
+<option value=""></option>
+       {CS_CORRECTION_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+   {/* 4. Lighting – reuse existing lighting options */}
+<div className="dm-pane-field">
+<label>Lighting</label>
+<select
+       value={am.Lighting ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { Lighting: e.target.value })
+       }
+>
+<option value=""></option>
+       {LIGHTING_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+   {/* 5. Eye comes from the existing showEye block above (no extra code needed) */}
 </>
 )}
 
