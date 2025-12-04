@@ -22,6 +22,8 @@ type AssessmentMeta = {
  SubjectiveRatingsSubCat?: string;
  SubjectiveRatingsAllThatApply?: string[];
  SPCMetadata?: string[];
+ LensFitSubCat?: string;
+ LensFitAllThatApply?: string[]
 };
 type TablePayload = {
  Columns: string[];
@@ -508,6 +510,20 @@ const SPC_METADATA_ALL_THAT_APPLY = [
 "Other"
 ]
 
+const LENS_FIT_ASSESSMENTS = [
+  "Lens Fit Assessments"
+]
+
+const LENS_FIT_SUBCAT = [
+  "Primary",
+  "Peripheral"
+]
+
+const LENS_FIT_ALL_THAT_APPLY = [
+  "Lens movement (overall fit)",
+  "Lens position (centration)"
+]
+
 const hasEyeDropdown = (name?: string): boolean =>
  !!name &&
  (
@@ -532,6 +548,8 @@ const isSubjectiveAssessment = (name?: string): boolean =>
   !!name && SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name)
 const isSPCAssessment = (name?: string): boolean =>
   !!name && SPC_ASSESSMENTS.includes(name)
+const isLensFitAssessment = (name?: string): boolean =>
+  !!name && LENS_FIT_ASSESSMENTS.includes(name)
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
@@ -555,6 +573,10 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (meta.Distance) parts.push(meta.Distance);
  if (meta.Lighting) parts.push(meta.Lighting);
  if (meta.Contrast) parts.push(meta.Contrast);
+ if (meta.LensFitSubCat) parts.push(meta.LensFitSubCat);
+ if (meta.LensFitAllThatApply && meta.LensFitAllThatApply.length) {
+  parts.push(meta.LensFitAllThatApply.join(", "))
+ }
  if (parts.length === 0) {
    return meta.AssessmentName;
  }
@@ -761,7 +783,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        ROVRange: undefined,
        SubjectiveRatingsSubCat: undefined,
        SubjectiveRatingsAllThatApply: [],
-       SPCMetadata: []
+       SPCMetadata: [],
+       LensFitSubCat: undefined,
+       LensFitAllThatApply: []
 
      };
    }
@@ -852,6 +876,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isROV = isROVAssessment(am.AssessmentName);
      const isSubjective = isSubjectiveAssessment(am.AssessmentName);
      const isSPC = isSPCAssessment(am.AssessmentName)
+     const isLensFit = isLensFitAssessment(am.AssessmentName)
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -1114,6 +1139,40 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 />
 </>
 )} 
+
+
+     {isLensFit && (
+<>
+   {/* (a) Subcategory */}
+<div className="dm-pane-field">
+<label>Sub Category</label>
+<select
+       value={am.LensFitSubCat ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { LensFitSubCat: e.target.value })
+       }
+>
+<option value=""></option>
+       {LENS_FIT_SUBCAT.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+
+   {/* (b) Method – select all that apply (multi-select, appears in header) */}
+<MultiSelect
+     label="Select all that apply"
+     options={LENS_FIT_ALL_THAT_APPLY}
+     selected={am.LensFitAllThatApply || []}
+     onChange={next =>
+       updateAssessmentMeta(pane.index, { LensFitAllThatApply: next })
+     }
+   />
+
+</>
+)}
 
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
