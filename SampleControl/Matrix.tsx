@@ -31,7 +31,9 @@ type AssessmentMeta = {
  CataractMehod?: string,
  CataractParameters?: string [],
  VFMethod?: string,
- SurgicalReportAllThatApply?: string[]
+ SurgicalReportAllThatApply?: string[],
+ SeverityscoreParameter?: string,
+ SeverityScoreCustomParameter?: string
 };
 
 type TablePayload = {
@@ -599,6 +601,17 @@ const SURGICAL_REPORT_ALL_THAT_APPLY: string[] = [
 "Other Procedures at Surgery"
 ]
 
+const SEVERITY_SCORE_ASSESSMENTS: string[] = [
+   "Severity Score"
+]
+
+const SEVERITY_SCORE_PARAMETER: string[] = [
+  "Halo",
+  "Starbursts",
+  "Glare",
+  "Add Custom"
+]
+
 
 const hasEyeDropdown = (name?: string): boolean =>
  !!name &&
@@ -638,6 +651,8 @@ const isVFAssessment = (name?: string): boolean =>
   !!name && VF_ASSESSMENTS.includes(name)
 const isSurgicalReportAssessment = (name?: string): boolean =>
   !!name && SURGICAL_REPORT_ASSESSMENTS.includes(name)
+const isSeverityScoreAssessment = (name?: string): boolean =>
+  !!name && SEVERITY_SCORE_ASSESSMENTS.includes(name)
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
@@ -670,6 +685,13 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
   parts.push(meta.CSMethodCustom);
  } else if (meta.CSMethod) {
   parts.push(meta.CSMethod);
+ }
+
+  if (meta.SeverityscoreParameter === "Add Custom" && meta.SeverityScoreCustomParameter) {
+  // show the custom text instead of the literal "Add Custom"
+  parts.push(meta.SeverityScoreCustomParameter);
+ } else if (meta.SeverityscoreParameter) {
+  parts.push(meta.SeverityscoreParameter);
  }
  if (meta.Correction) parts.push(meta.Correction);
  if (meta.Notation) parts.push(meta.Notation);
@@ -894,7 +916,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        CataractMehod: undefined,
        CataractParameters: [],
        VFMethod: undefined,
-       SurgicalReportAllThatApply: []
+       SurgicalReportAllThatApply: [],
+       SeverityScoreCustomParameter: undefined,
+       SeverityscoreParameter: undefined
      };
    }
 
@@ -990,6 +1014,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isCataract = isCataractAssessment(am.AssessmentName);
      const isVF = isVFAssessment(am.AssessmentName);
      const isSurgicalReport = isSurgicalReportAssessment(am.AssessmentName);
+     const isSeverityScore = isSeverityScoreAssessment(am.AssessmentName)
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -1439,6 +1464,55 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        updateAssessmentMeta(pane.index, { SurgicalReportAllThatApply: next })
      }
    />
+</>
+)}
+
+
+     {isSeverityScore && (
+<>
+   {/* 1. Method */}
+<div className="dm-pane-field">
+<label>Parameter</label>
+<select
+       value={am.SeverityscoreParameter ?? ""}
+       onChange={e => {
+         const value = e.target.value;
+         // if method changes away from Add Custom, clear custom text
+         if (value !== "Add Custom") {
+           updateAssessmentMeta(pane.index, {
+             SeverityscoreParameter: value,
+             SeverityScoreCustomParameter: undefined
+           });
+         } else {
+           updateAssessmentMeta(pane.index, {
+             SeverityscoreParameter: value
+           });
+         }
+       }}
+>
+<option value=""></option>
+       {SEVERITY_SCORE_PARAMETER.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+   {/* 2. Custom method text, only when "Add Custom" selected */}
+   {am.SeverityscoreParameter === "Add Custom" && (
+<div className="dm-pane-field">
+<label>Add Custom</label>
+<input
+         type="text"
+         className="dm-input"
+         placeholder="Enter Custom Parameter"
+         value={am.SeverityScoreCustomParameter ?? ""}
+         onChange={e =>
+           updateAssessmentMeta(pane.index, { SeverityScoreCustomParameter: e.target.value })
+         }
+       />
+</div>
+   )}
 </>
 )}
 
