@@ -235,3 +235,98 @@
 .dm-multi-dropdown-option--selected {
  background: #f3f2f1;
 }
+
+.dm-multi-select {
+ width: 100%;
+ min-height: 80px;
+ box-sizing: border-box;
+}
+.dm-multi-select-hint {
+ font-size: 10px;
+ color: #605e5c;
+}
+
+/* for Timepoint / Window inline selects */
+.dm-inline-group {
+ display: flex;
+ gap: 4px;
+}
+.dm-inline-group select {
+ flex: 1 1 0;
+}
+/* Simple toggle for Exit? */
+.dm-toggle {
+ position: relative;
+ display: inline-block;
+ width: 36px;
+ height: 20px;
+}
+.dm-toggle input {
+ opacity: 0;
+ width: 0;
+ height: 0;
+}
+.dm-toggle-slider {
+ position: absolute;
+ cursor: pointer;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background-color: #ccc;
+ transition: 0.2s;
+ border-radius: 34px;
+}
+.dm-toggle-slider:before {
+ position: absolute;
+ content: "";
+ height: 14px;
+ width: 14px;
+ left: 3px;
+ top: 3px;
+ background-color: white;
+ transition: 0.2s;
+ border-radius: 50%;
+}
+.dm-toggle input:checked + .dm-toggle-slider {
+ background-color: #0078d4;
+}
+.dm-toggle input:checked + .dm-toggle-slider:before {
+ transform: translateX(16px);
+}
+
+
+.dm-col-header-display {
+ display: block;
+ width: 100%;
+ text-align: left;
+ white-space: pre-wrap;      /* respect \n */
+ word-break: break-word;
+ padding: 4px;
+ min-height: 32px;
+ background: #fff;
+ border: 1px solid #ccc;
+ box-sizing: border-box;
+ min-width: 140px;
+ /* reset default button styling */
+ border-radius: 0;
+ outline: none;
+}
+/* optional: make header cells align from the top */
+.dm-table th,
+.dm-table td {
+ border: 1px solid #ccc;
+ vertical-align: top;
+}
+
+/* remove native button chrome */
+.dm-col-header-display.dm-clickable {
+ background-color: #fff;
+ border-color: #ccc;
+}
+.dm-col-header-display.dm-clickable:focus {
+ outline: 1px solid #0078d4;   /* optional focus ring */
+}
+.dm-col-header-display.dm-clickable:hover {
+ background-color: #f3f2f1;
+}

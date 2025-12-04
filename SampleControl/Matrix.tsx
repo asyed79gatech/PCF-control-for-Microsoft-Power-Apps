@@ -3,6 +3,14 @@ type Row = { RowHeader: string; Cells: string[] };
 type VisitMeta = {
  VisitNumber?: string;
  VisitName?: string;
+ Lens?: string;
+ TimepointUnit?: string;
+ TimepointValue?: string;
+ WindowSign?: string;
+ WindowValue?: string;
+ WindowUnit?: string;
+ Exit?: boolean;
+
 };
 type AssessmentMeta = {
  AssessmentName?: string;
@@ -175,8 +183,8 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Meibomian Gland Functionality Assessment",
  "Misallocation",
  "National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)",
- "Non-Invasive Keratography Break-Up Time (NIKBUT)",
- "Non-Invasive Tear Break-Up Time (NITBUT)",
+ "Noninvasive Keratography Break-Up Time (NIKBUT)",
+ "Noninvasive Tear Break-Up Time (NITBUT)",
  "Number of Lenses for Successful Fit",
  "Objective Refraction",
  "Ocular Comfort Index (OCI)",
@@ -613,6 +621,64 @@ const SEVERITY_SCORE_PARAMETER: string[] = [
 ]
 
 
+const VISIT_NAME_OPTIONS: string[] = [
+  "Baseline",
+"Baseline/Dispense",
+"Baseline/Exposure",
+"Dispense",
+"Early Exit Visit",
+"Exposure",
+"Follow-Up",
+"Follow-Up Lens #/Dispense Lens #",
+"Follow-Up with Test",
+"N/A",
+"Screen/Baseline",
+"Screen/Baseline/Dispense",
+"Screen/Baseline/Dispense",
+"Screen/Baseline/Exposure",
+"Screen/Baseline/Fitting",
+"Screen/Baseline/In-Chair Comparison",
+"Screen/Exposure",
+"Screen/Trial Lens Fitting & Evaluation",
+"Screening",
+"Unscheduled Visit"
+]
+
+const LENS_OPTIONS: string[] = [
+"Lens 1",
+"Lens 2",
+"Lens 3",
+"Lens 4",
+"Lens 5",
+"N/A",
+]
+
+const TIMEPOINT_UNIT_OPTIONS: string[] = [
+"Hour",
+"Day",
+"Week",
+"Month"
+]
+
+const TIMEPOINT_VALUE_OPTIONS: string[] = []
+  for (let i =-1; i <=100; i++) {
+    TIMEPOINT_VALUE_OPTIONS.push(i.toString());
+  }
+
+const WINDOW_SIGN_OPTIONS: string[] = ["(+)", "(-)", "(+/-)"];
+
+const WINDOW_VALUE_OPTIONS: string[] = TIMEPOINT_VALUE_OPTIONS.slice();
+
+const WINDOW_UNIT_OPTIONS: string[] = [
+  "Minute(s)",
+"Hour(s)",
+"Day(s)",
+"Week(s)",
+"Month(s)"
+]
+
+
+
 const hasEyeDropdown = (name?: string): boolean =>
  !!name &&
  (
@@ -707,6 +773,36 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  }
  // "AssessmentName Eye, Correction, Notation, Distance, Lighting, Contrast"
  return `${meta.AssessmentName} ${parts.join(", ")}`;
+};
+
+
+
+const formatVisitHeader = (meta: VisitMeta): string => {
+ const lines: string[] = [];
+ // 1) Visit Number
+ if (meta.VisitNumber) {
+   lines.push(meta.VisitNumber);
+ }
+ // 2) Visit Name (+ /Exit if toggle is on)
+ if (meta.VisitName) {
+   lines.push(meta.VisitName);
+ }
+ // 3) Lens
+ if (meta.Lens) {
+   lines.push(`${meta.Lens}`);
+ }
+ // 4) Timepoint
+ if (meta.TimepointUnit && meta.TimepointValue) {
+   lines.push(`${meta.TimepointUnit} ${meta.TimepointValue}`);
+ }
+ // 5) Window
+ if (meta.WindowSign && meta.WindowValue && meta.WindowUnit) {
+   lines.push(`${meta.WindowSign} ${meta.WindowValue} ${meta.WindowUnit}`);
+ }
+ // Exit
+  const exitSuffix = meta.Exit ? "/Exit" : "";
+  lines.push(exitSuffix)
+ return lines.join("\n"); // "\n" so you *can* show each on new line
 };
 
 
@@ -869,21 +965,21 @@ React.useEffect(() => {
      return arr;
    });
  };
- const updateVisitMeta = (index: number, patch: Partial<VisitMeta>) => {
-   setVisitMeta(prev => {
-     const arr = [...prev];
-     const current = arr[index] || {};
-     const updated: VisitMeta = { ...current, ...patch };
-     arr[index] = updated;
-     const headerText = [updated.VisitNumber, updated.VisitName].filter(Boolean).join(" - ");
-     setColumns(prevCols => {
-       const cols = [...prevCols];
-       cols[index] = headerText;
-       return cols;
-     });
-     return arr;
+const updateVisitMeta = (index: number, patch: Partial<VisitMeta>) => {
+ setVisitMeta(prev => {
+   const arr = [...prev];
+   const current = arr[index] || {};
+   const updated: VisitMeta = { ...current, ...patch };
+   arr[index] = updated;
+   const headerText = formatVisitHeader(updated);
+   setColumns(prevCols => {
+     const cols = [...prevCols];
+     cols[index] = headerText;
+     return cols;
    });
- };
+   return arr;
+ });
+};
 const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => {
  setAssessmentMeta(prev => {
    const arr = [...prev];
@@ -936,22 +1032,29 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
  // ---------- PANE RENDERING ----------
  const renderPane = () => {
    if (!pane) return null;
-   if (pane.mode === "column") {
-     const vm = visitMeta[pane.index] || {};
-     return (
+     if (pane.mode === "column") {
+ const vm = visitMeta[pane.index] || {};
+ return (
 <div className="dm-pane">
 <div className="dm-pane-content">
 <div className="dm-pane-header">
 <h3>Build Visit (Column {pane.index + 1})</h3>
-<button type="button" className="dm-pane-close" onClick={() => setPane(null)}>
-               ×
+<button
+           type="button"
+           className="dm-pane-close"
+           onClick={() => setPane(null)}
+>
+           ×
 </button>
 </div>
+       {/* Visit Number (unchanged) */}
 <div className="dm-pane-field">
 <label>Visit Number</label>
 <select
-               value={vm.VisitNumber ?? ""}
-               onChange={e => updateVisitMeta(pane.index, { VisitNumber: e.target.value })}
+           value={vm.VisitNumber ?? ""}
+           onChange={e =>
+             updateVisitMeta(pane.index, { VisitNumber: e.target.value })
+           }
 >
 <option value=""></option>
 <option value="Visit 00">Visit 00</option>
@@ -978,27 +1081,140 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 <option value="Visit 20">Visit 20</option>
 </select>
 </div>
+       {/* Visit Name – NEW options */}
 <div className="dm-pane-field">
 <label>Visit Name</label>
 <select
-               value={vm.VisitName ?? ""}
-               onChange={e => updateVisitMeta(pane.index, { VisitName: e.target.value })}
+           value={vm.VisitName ?? ""}
+           onChange={e =>
+             updateVisitMeta(pane.index, { VisitName: e.target.value })
+           }
 >
 <option value=""></option>
-<option value="Baseline">Baseline</option>
-<option value="Lens">Lens</option>
-<option value="Exit">Exit</option>
+           {VISIT_NAME_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+               {opt}
+</option>
+           ))}
 </select>
+</div>
+       {/* Lens */}
+<div className="dm-pane-field">
+<label>Lens</label>
+<select
+           value={vm.Lens ?? ""}
+           onChange={e =>
+             updateVisitMeta(pane.index, { Lens: e.target.value })
+           }
+>
+<option value=""></option>
+           {LENS_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+               {opt}
+</option>
+           ))}
+</select>
+</div>
+       {/* Timepoint: [Unit] [Value] */}
+<div className="dm-pane-field">
+<label>Timepoint</label>
+<div className="dm-inline-group">
+<select
+             value={vm.TimepointUnit ?? ""}
+             onChange={e =>
+               updateVisitMeta(pane.index, { TimepointUnit: e.target.value })
+             }
+>
+<option value=""></option>
+             {TIMEPOINT_UNIT_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                 {opt}
+</option>
+             ))}
+</select>
+<select
+             value={vm.TimepointValue ?? ""}
+             onChange={e =>
+               updateVisitMeta(pane.index, { TimepointValue: e.target.value })
+             }
+>
+<option value=""></option>
+             {TIMEPOINT_VALUE_OPTIONS.map(v => (
+<option key={v} value={v}>
+                 {v}
+</option>
+             ))}
+</select>
+</div>
+</div>
+       {/* Window: [Sign] [Value] [Unit] */}
+<div className="dm-pane-field">
+<label>Window</label>
+<div className="dm-inline-group">
+<select
+             value={vm.WindowSign ?? ""}
+             onChange={e =>
+               updateVisitMeta(pane.index, { WindowSign: e.target.value })
+             }
+>
+<option value=""></option>
+             {WINDOW_SIGN_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                 {opt}
+</option>
+             ))}
+</select>
+<select
+             value={vm.WindowValue ?? ""}
+             onChange={e =>
+               updateVisitMeta(pane.index, { WindowValue: e.target.value })
+             }
+>
+<option value=""></option>
+             {WINDOW_VALUE_OPTIONS.map(v => (
+<option key={v} value={v}>
+                 {v}
+</option>
+             ))}
+</select>
+<select
+             value={vm.WindowUnit ?? ""}
+             onChange={e =>
+               updateVisitMeta(pane.index, { WindowUnit: e.target.value })
+             }
+>
+<option value=""></option>
+             {WINDOW_UNIT_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                 {opt}
+</option>
+             ))}
+</select>
+</div>
+</div>
+       {/* Exit toggle */}
+<div className="dm-pane-field">
+<label>Exit?</label>
+<label className="dm-toggle">
+<input
+             type="checkbox"
+             checked={!!vm.Exit}
+             onChange={e =>
+               updateVisitMeta(pane.index, { Exit: e.target.checked })
+             }
+           />
+<span className="dm-toggle-slider" />
+</label>
 </div>
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
-               Save & Close
+           Save & Close
 </button>
 </div>
 </div>
 </div>
-     );
-   }
+ );
+}
    if (pane.mode === "row") {
      const am = assessmentMeta[pane.index] || {};
      const showEye = hasEyeDropdown(am.AssessmentName);
@@ -1546,41 +1762,42 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
              {columns.map((c, i) => (
 <th key={i}>
 <div className="dm-col-header-wrapper">
-<input
-                     value={c}
-                     readOnly
-                     onClick={() => setPane({ mode: "column", index: i })}
-                     className="dm-input dm-col-header dm-clickable"
-                   />
+<button
+       type="button"
+       className="dm-col-header-display dm-clickable"
+       onClick={() => setPane({ mode: "column", index: i })}
+>
+       {c}
+</button>
 <div className="dm-header-buttons">
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => moveColumn(i, i - 1)}
-                       title="Move left"
+         type="button"
+         className="dm-small"
+         onClick={() => moveColumn(i, i - 1)}
+         title="Move left"
 >
-                       ←
+         ←
 </button>
 <button
-                       type="button"
-                       className="dm-small"
-                       onClick={() => moveColumn(i, i + 1)}
-                       title="Move right"
+         type="button"
+         className="dm-small"
+         onClick={() => moveColumn(i, i + 1)}
+         title="Move right"
 >
-                       →
+         →
 </button>
 <button
-                       type="button"
-                       className="dm-danger dm-small"
-                       onClick={() => removeColumn(i)}
-                       title="Delete column"
+         type="button"
+         className="dm-danger dm-small"
+         onClick={() => removeColumn(i)}
+         title="Delete column"
 >
-                       ×
+         ×
 </button>
 </div>
 </div>
 </th>
-             ))}
+))}
 </tr>
 </thead>
 <tbody>
