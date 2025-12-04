@@ -19,6 +19,9 @@ type AssessmentMeta = {
  RefractionMetadata?: string[];
  ROVMethod?: string[];
  ROVRange?: string;
+ SubjectiveRatingsSubCat?: string;
+ SubjectiveRatingsAllThatApply?: string[];
+ SPCMetadata?: string[];
 };
 type TablePayload = {
  Columns: string[];
@@ -447,6 +450,63 @@ const ROV_METHOD_OPTIONS = [
   "(Negative Defocus Range Only)"
 ]
 
+const SUBJECTIVE_RATINGS_ASSESSMENTS = [
+  "Subjective Likert Questionnaire (5-Point Scale)",
+  "Subjective Ratings",
+  "Subjective Ratings (1-10 Scale)",
+  "Visual Analog Scale (VAS)",
+  "Subject Diary"
+]
+
+const SUBJECTIVE_RATINGS_SUBCAT = [
+"Agreement",
+"Ocular Comfort",
+"Satisfaction",
+"Preference"
+]
+
+const SUBJECTIVE_RATINGS_ALL_THAT_APPLY = [
+"All Day Confort",
+"Corneal Pain",
+"Ease of Insertion",
+"Ease of Removal",
+"End of Day Comfort",
+"Insertion Comfort",
+"Insertion Handling",
+"Insertion Vision",
+"Overall Comfort",
+"Overall Impression",
+"Overall Preference",
+"Overall Vision",
+"Quality of Vision",
+"Removal Handling",
+"Ghosting"
+]
+
+const SPC_ASSESSMENTS = [
+"Symptomatology Questionnaire",
+"Symptoms, Problems, and Complaints"
+]
+
+const SPC_METADATA_ALL_THAT_APPLY = [
+"Drop Burning",
+"Drop Stinging",
+"Burning",
+"Halo",
+"Stinging",
+"Itching",
+"Lens Awareness",
+"Dryness",
+"Discomfort",
+"Blurred Vision",
+"Fluctuating/Variable Vision",
+"Lens Needs Cleaning",
+"Redness",
+"Excessive Tearing",
+"Secretions",
+"Photophobia",
+"Other"
+]
 
 const hasEyeDropdown = (name?: string): boolean =>
  !!name &&
@@ -454,7 +514,9 @@ const hasEyeDropdown = (name?: string): boolean =>
    ASSESSMENTS_WITH_EYE.includes(name) ||
    VISUAL_ACUITY_ASSESSMENTS.includes(name) ||
    REFRACTION_ASSESSMENTS.includes(name) ||
-   ROV_ASSESSMENTS.includes(name)     
+   ROV_ASSESSMENTS.includes(name) ||
+   SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name) ||
+   SPC_ASSESSMENTS.includes(name)
  );
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
@@ -466,12 +528,19 @@ const isRefractionAssessment = (name?: string): boolean =>
  !!name && REFRACTION_ASSESSMENTS.includes(name);
 const isROVAssessment = (name?: string): boolean =>
   !!name && ROV_ASSESSMENTS.includes(name);
+const isSubjectiveAssessment = (name?: string): boolean =>
+  !!name && SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name)
+const isSPCAssessment = (name?: string): boolean =>
+  !!name && SPC_ASSESSMENTS.includes(name)
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
  const parts: string[] = [];
  // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
-
+ if (meta.SubjectiveRatingsSubCat) parts.push(meta.SubjectiveRatingsSubCat);
+ if(meta.SubjectiveRatingsAllThatApply && meta.SubjectiveRatingsAllThatApply.length) {
+  parts.push(meta.SubjectiveRatingsAllThatApply.join(", "))
+ }
  if (meta.Eye) parts.push(meta.Eye);
  if (meta.BioSlitSpecify) parts.push(meta.BioSlitSpecify);
  if(meta.RefractionAllThatApply && meta.RefractionAllThatApply.length) {
@@ -689,7 +758,11 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        RefractionAllThatApply: [],
        RefractionMetadata: [],
        ROVMethod: [],
-       ROVRange: undefined
+       ROVRange: undefined,
+       SubjectiveRatingsSubCat: undefined,
+       SubjectiveRatingsAllThatApply: [],
+       SPCMetadata: []
+
      };
    }
    arr[index] = updated;
@@ -777,6 +850,8 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isHabitual = isHabitualAssessment(am.AssessmentName);
      const isRefraction = isRefractionAssessment(am.AssessmentName);
      const isROV = isROVAssessment(am.AssessmentName);
+     const isSubjective = isSubjectiveAssessment(am.AssessmentName);
+     const isSPC = isSPCAssessment(am.AssessmentName)
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -993,6 +1068,52 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </div>
 </>
 )}
+
+
+     {isSubjective && (
+<>
+   {/* (a) Subcategory */}
+<div className="dm-pane-field">
+<label>Sub Category</label>
+<select
+       value={am.SubjectiveRatingsSubCat ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { SubjectiveRatingsSubCat: e.target.value })
+       }
+>
+<option value=""></option>
+       {SUBJECTIVE_RATINGS_SUBCAT.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+
+   {/* (b) Method – select all that apply (multi-select, appears in header) */}
+<MultiSelect
+     label="Select all that apply"
+     options={SUBJECTIVE_RATINGS_ALL_THAT_APPLY}
+     selected={am.SubjectiveRatingsAllThatApply || []}
+     onChange={next =>
+       updateAssessmentMeta(pane.index, { SubjectiveRatingsAllThatApply: next })
+     }
+   />
+
+</>
+)}
+
+     {isSPC && (
+<>
+   {/* Metadata (multi-select, checkboxes, NOT in header) */}
+<MultiSelect
+ label="Metadata"
+ options={SPC_METADATA_ALL_THAT_APPLY}
+ selected={am.SPCMetadata}
+ onChange={next => updateAssessmentMeta(pane.index, { SPCMetadata: next })}
+/>
+</>
+)} 
 
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
