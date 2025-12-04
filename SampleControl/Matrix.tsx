@@ -27,8 +27,11 @@ type AssessmentMeta = {
  CSMethod?: string,
  CSMethodCustom?: string,
  CSCorrection?: string,
- CSLighting?: string
+ CSLighting?: string,
+ CataractMehod?: string,
+ CataractParameters?: string [],
 };
+
 type TablePayload = {
  Columns: string[];
  Rows: Row[];
@@ -546,6 +549,32 @@ const CS_CORRECTION_OPTIONS: string[] = [
 "Corrected"
 ]
 
+const CATARACT_ASSESSMENTS: string[] = [
+  "Cataract Grading"
+]
+
+const CATARACT_METHOD: string[] = [
+"Lens Opacities Classification System (LOCS)",
+"Wisconsin Grading System (WGS)",
+"Age-Related Eye Disease Study (AREDS)",
+"Simple Pre-Operative Nuclear Classification Score (SPONCS)",
+"Wilmer System",
+"Oxford System",
+"World Health Organization (WHO) Criteria",
+"Objective (Scheimpflug/OCT/SFR)"
+]
+
+
+const CATARACT_PARAMETERS: string[] = [
+"Nuclear Opalescence (NO)",
+"Nuclear Color (NC)",
+"Cortical Catarat (C)",
+"Posterior Subcapsular Cataracts (PSC)",
+"Vacoles"
+]
+
+
+
 const hasEyeDropdown = (name?: string): boolean =>
  !!name &&
  (
@@ -555,7 +584,8 @@ const hasEyeDropdown = (name?: string): boolean =>
    ROV_ASSESSMENTS.includes(name) ||
    SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name) ||
    SPC_ASSESSMENTS.includes(name) ||
-   CS_ASSESSMNETS.includes(name)
+   CS_ASSESSMNETS.includes(name) ||
+   CATARACT_ASSESSMENTS.includes(name)
  );
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
@@ -575,11 +605,17 @@ const isLensFitAssessment = (name?: string): boolean =>
   !!name && LENS_FIT_ASSESSMENTS.includes(name)
 const isCSAssessment = (name?: string): boolean =>
   !!name && CS_ASSESSMNETS.includes(name)
+const isCataractAssessment = (name?: string): boolean =>
+  !!name && CATARACT_ASSESSMENTS.includes(name)
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
  const parts: string[] = [];
  // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
+ if (meta.CataractMehod) parts.push(meta.CataractMehod);
+ if(meta.CataractParameters && meta.CataractParameters.length) {
+  parts.push(meta.CataractParameters.join(", "))
+ }
  if (meta.SubjectiveRatingsSubCat) parts.push(meta.SubjectiveRatingsSubCat);
  if(meta.SubjectiveRatingsAllThatApply && meta.SubjectiveRatingsAllThatApply.length) {
   parts.push(meta.SubjectiveRatingsAllThatApply.join(", "))
@@ -819,7 +855,9 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        LensFitSubCat: undefined,
        LensFitAllThatApply: [],
        CSMethod: undefined,
-       CSMethodCustom: undefined
+       CSMethodCustom: undefined,
+       CataractMehod: undefined,
+       CataractParameters: []
 
      };
    }
@@ -911,7 +949,8 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isSubjective = isSubjectiveAssessment(am.AssessmentName);
      const isSPC = isSPCAssessment(am.AssessmentName);
      const isLensFit = isLensFitAssessment(am.AssessmentName);
-     const isCS = isCSAssessment(am.AssessmentName)
+     const isCS = isCSAssessment(am.AssessmentName);
+     const isCataract = isCataractAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -1290,6 +1329,40 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </select>
 </div>
    {/* 5. Eye comes from the existing showEye block above (no extra code needed) */}
+</>
+)}
+
+
+     {isCataract && (
+<>
+   {/* (a) Subcategory */}
+<div className="dm-pane-field">
+<label>Method</label>
+<select
+       value={am.CataractMehod ?? ""}
+       onChange={e =>
+         updateAssessmentMeta(pane.index, { CataractMehod: e.target.value })
+       }
+>
+<option value=""></option>
+       {CATARACT_METHOD.map(opt => (
+<option key={opt} value={opt}>
+           {opt}
+</option>
+       ))}
+</select>
+</div>
+
+   {/* (b) Method – select all that apply (multi-select, appears in header) */}
+<MultiSelect
+     label="Parameters (All that Apply)"
+     options={CATARACT_PARAMETERS}
+     selected={am.CataractParameters || []}
+     onChange={next =>
+       updateAssessmentMeta(pane.index, { CataractParameters: next })
+     }
+   />
+
 </>
 )}
 
