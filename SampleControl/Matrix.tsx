@@ -30,7 +30,8 @@ type AssessmentMeta = {
  CSLighting?: string,
  CataractMehod?: string,
  CataractParameters?: string [],
- VFMethod?: string
+ VFMethod?: string,
+ SurgicalReportAllThatApply?: string[]
 };
 
 type TablePayload = {
@@ -585,7 +586,18 @@ const VF_METHODS: string[] = [
 "(Topcon)"
 ]
 
+const SURGICAL_REPORT_ASSESSMENTS: string[] = [
+   "Surgical Report"
+]
 
+const SURGICAL_REPORT_ALL_THAT_APPLY: string[] = [
+  "Operating Eye",
+"Implanting Surgeon",
+"Lens Information",
+"Implant Success",
+"Surgical Problems",
+"Other Procedures at Surgery"
+]
 
 
 const hasEyeDropdown = (name?: string): boolean =>
@@ -599,7 +611,8 @@ const hasEyeDropdown = (name?: string): boolean =>
    SPC_ASSESSMENTS.includes(name) ||
    CS_ASSESSMNETS.includes(name) ||
    CATARACT_ASSESSMENTS.includes(name) ||
-   VF_ASSESSMENTS.includes(name)
+   VF_ASSESSMENTS.includes(name) ||
+   SURGICAL_REPORT_ASSESSMENTS.includes(name)
  );
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
@@ -623,11 +636,16 @@ const isCataractAssessment = (name?: string): boolean =>
   !!name && CATARACT_ASSESSMENTS.includes(name)
 const isVFAssessment = (name?: string): boolean =>
   !!name && VF_ASSESSMENTS.includes(name)
+const isSurgicalReportAssessment = (name?: string): boolean =>
+  !!name && SURGICAL_REPORT_ASSESSMENTS.includes(name)
 
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
  if (!meta.AssessmentName) return "";
  const parts: string[] = [];
  // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
+  if(meta.SurgicalReportAllThatApply && meta.SurgicalReportAllThatApply.length) {
+  parts.push(meta.SurgicalReportAllThatApply.join(", "))
+ }
  if(meta.VFMethod) parts.push(meta.VFMethod)
  if (meta.CataractMehod) parts.push(meta.CataractMehod);
  if(meta.CataractParameters && meta.CataractParameters.length) {
@@ -875,7 +893,8 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        CSMethodCustom: undefined,
        CataractMehod: undefined,
        CataractParameters: [],
-       VFMethod: undefined
+       VFMethod: undefined,
+       SurgicalReportAllThatApply: []
      };
    }
 
@@ -970,6 +989,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
      const isCS = isCSAssessment(am.AssessmentName);
      const isCataract = isCataractAssessment(am.AssessmentName);
      const isVF = isVFAssessment(am.AssessmentName);
+     const isSurgicalReport = isSurgicalReportAssessment(am.AssessmentName);
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
@@ -1404,6 +1424,21 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
        ))}
 </select>
 </div>
+</>
+)}
+
+
+     {isSurgicalReport && (
+<>
+   {/* (b) All that Apply – select all that apply (multi-select, appears in header) */}
+<MultiSelect
+     label="Select All that Apply"
+     options={SURGICAL_REPORT_ALL_THAT_APPLY}
+     selected={am.SurgicalReportAllThatApply || []}
+     onChange={next =>
+       updateAssessmentMeta(pane.index, { SurgicalReportAllThatApply: next })
+     }
+   />
 </>
 )}
 
