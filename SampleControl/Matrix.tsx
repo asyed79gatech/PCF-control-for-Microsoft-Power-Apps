@@ -1758,7 +1758,7 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 <table className="dm-table" cellPadding={4} cellSpacing={0}>
 <thead>
 <tr>
-<th style={{ minWidth: 180 }}>Row Header</th>
+<th style={{ minWidth: 180 }}>Procedure/Assessment</th>
              {columns.map((c, i) => (
 <th key={i}>
 <div className="dm-col-header-wrapper">
