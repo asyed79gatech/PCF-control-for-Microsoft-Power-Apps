@@ -3,14 +3,6 @@ type Row = { RowHeader: string; Cells: string[] };
 type VisitMeta = {
  VisitNumber?: string;
  VisitName?: string;
- Lens?: string;
- TimepointUnit?: string;
- TimepointValue?: string;
- WindowSign?: string;
- WindowValue?: string;
- WindowUnit?: string;
- Exit?: boolean;
-
 };
 type AssessmentMeta = {
  AssessmentName?: string;
@@ -20,108 +12,28 @@ type AssessmentMeta = {
  Distance?: string;
  Lighting?: string;
  Contrast?: string;
- BioSlitSpecify?: string;
- BioSlitMetadata?: string[];
- HabitualMetadata?: string[];
- RefractionAllThatApply?: string[];
- RefractionMetadata?: string[];
- ROVMethod?: string[];
- ROVRange?: string;
- SubjectiveRatingsSubCat?: string;
- SubjectiveRatingsAllThatApply?: string[];
- SPCMetadata?: string[];
- LensFitSubCat?: string;
- LensFitAllThatApply?: string[],
- CSMethod?: string,
- CSMethodCustom?: string,
- CSCorrection?: string,
- CSLighting?: string,
- CataractMehod?: string,
- CataractParameters?: string [],
- VFMethod?: string,
- SurgicalReportAllThatApply?: string[],
- SeverityscoreParameter?: string,
- SeverityScoreCustomParameter?: string
+ Specify_Bioslit?: string;
+ Metadata_Bioslit?: string[];
+ // ✅ NEW: custom assessment support
+ IsCustom?: boolean;
+ CustomAssessment?: string;
 };
-
 type TablePayload = {
  Columns: string[];
  Rows: Row[];
  VisitMeta?: VisitMeta[];
  AssessmentMeta?: AssessmentMeta[];
- AssessmentNames?: string[]; 
+ AssessmentNames?: string[];
 };
 export type MatrixProps = {
  initialJson?: string;
  onChange: (json: string) => void;
 };
-
-//-----------Multi-select Dropdown----
-type MultiSelectProps = {
- label: string;
- options: string[];
- selected?: string[];
- onChange: (next: string[]) => void;
-};
-const MultiSelect: React.FC<MultiSelectProps> = ({
- label,
- options,
- selected = [],
- onChange
-}) => {
- const [open, setOpen] = React.useState(false);
- const toggleOption = (opt: string) => {
-   const exists = selected.includes(opt);
-   const next = exists ? selected.filter(x => x !== opt) : [...selected, opt];
-   onChange(next);
- };
- const displayText =
-   selected.length === 0 ? "Select..." : selected.join(", ");
- return (
-<div className="dm-pane-field">
-<label>{label}</label>
-<div
-       className="dm-multi-dropdown"
-       onClick={() => setOpen(o => !o)}
->
-<span className={selected.length === 0 ? "dm-multi-placeholder" : ""}>
-         {displayText}
-</span>
-<span className="dm-multi-caret">▾</span>
-</div>
-     {open && (
-<div className="dm-multi-dropdown-menu">
-         {options.map(opt => {
-           const isSelected = selected.includes(opt);
-           return (
-<div
-               key={opt}
-               className={
-                 "dm-multi-dropdown-option" +
-                 (isSelected ? " dm-multi-dropdown-option--selected" : "")
-               }
-               onClick={e => {
-                 e.stopPropagation();
-                 toggleOption(opt);
-               }}
->
-<input type="checkbox" readOnly checked={isSelected} />
-<span>{opt}</span>
-</div>
-           );
-         })}
-</div>
-     )}
-</div>
- );
-};
-
-// ---------- CONSTANTS ----------
+// -------------------- Constants --------------------
 const ASSESSMENT_OPTIONS: string[] = [
  "Aberrometry",
  "Adverse Event(s)",
  "Autorefractometry",
- "Anterior Chamber Depth",
  "Axial Length",
  "Axis Orientation",
  "Baseline Characteristics",
@@ -142,7 +54,6 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Corneal Topography",
  "Cycloplegic Refraction",
  "Defocus Curve",
- "Depth of Focus",
  "Demographics",
  "Device Deficiency",
  "Digital Device Use",
@@ -158,7 +69,6 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Fundus Examination",
  "Gonioscopy",
  "Habitual History",
- "Habitual Lens Usage",
  "History of Primary Diagnosis",
  "Horizontal Visible Iris Diameter (HVID)",
  "Hours of Digital Use Per Day",
@@ -179,15 +89,15 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Lens Surface Assessments (Wettabiity, Deposits)",
  "Lens Wear Time",
  "Lissamine Green Circumlimbal Conjunctival Staining",
- "Manifest Refraction (MRSE)",
+ "Manifest Refraction",
  "McCarty Symptom Questionnaire",
  "McMonnies Questionnaire",
  "Medical History and Concomitant Medications",
  "Meibomian Gland Functionality Assessment",
  "Misallocation",
  "National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)",
- "Noninvasive Keratography Break-Up Time (NIKBUT)",
- "Noninvasive Tear Break-Up Time (NITBUT)",
+ "Non-Invasive Keratography Break-Up Time (NIKBUT)",
+ "Non-Invasive Tear Break-Up Time (NITBUT)",
  "Number of Lenses for Successful Fit",
  "Objective Refraction",
  "Ocular Comfort Index (OCI)",
@@ -198,14 +108,11 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Pachymetry",
  "Physical Examination (Targeted)",
  "Posterior Capsule Opacification",
- "Predicted Residual Astigmatism",
  "Pregnancy Test",
  "Pupil Size",
  "Quality of Vision (QoV)",
  "Questionnaire for Visual Disturbances (QUVID)",
  "Range of Vision",
- "Real-World Subjective Questions",
- "Randomization",
  "Reading Speed",
  "Rewetting Drop Usage",
  "Schein Questionnaire",
@@ -213,7 +120,6 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Slit Lamp Examination",
  "Standard Patient Evaluation of Eye Dryness Questionnaire (SPEED)",
  "Stereopsis Test",
- "Stimulus-Based Subjective Questions",
  "Study Lens Power",
  "Subject Diary",
  "Subjective Likert Questionnaire (5-Point Scale)",
@@ -222,10 +128,6 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Symptom Assessment In Dry Eye (SANDE)",
  "Symptomatology Questionnaire",
  "Symptoms, Problems, and Complaints",
- "Surgical Report",
- "Severity Score",
- "Secondary Surgical Interventions",
- "Target Residual Refractive Error",
  "Tear Meniscus Height",
  "Texas Eye Research and Technology Center Dry Eye Questionnaire (TERTC-DEQ)",
  "Time to Questionnaire Completion",
@@ -239,7 +141,17 @@ const ASSESSMENT_OPTIONS: string[] = [
  "Visual Analog Scale (VAS)",
  "Visual Blur Profile",
  "Visual Field Test",
- "Vital Signs"
+ "Vital Signs",
+ "Surgical Report",
+ "Depth of Focus",
+ "Severity Score",
+ "Secondary Surgical Interventions",
+ "Anterior Chamber Depth",
+ "Target Residual Refractive Error",
+ "Predicted Residual Astigmatism",
+ "Stimulus-Based Subjective Questions",
+ "Real-World Subjective Questions",
+ "Randomization"
 ];
 const ASSESSMENTS_WITH_EYE: string[] = [
  "Aberrometry",
@@ -324,6 +236,10 @@ const VISUAL_ACUITY_ASSESSMENTS: string[] = [
  "Uncorrected Near Visual Acuity (UCNVA)",
  "Uncorrected Visual Acuity (UCVA)"
 ];
+const BIOSLIT_ASSESSMENTS: string[] = [
+ "Biomicroscopy",
+ "Slit Lamp Examination",
+];
 const CORRECTION_OPTIONS: string[] = [
  "with Habitual Correction",
  "with Habitual Lens",
@@ -371,13 +287,7 @@ const CONTRAST_OPTIONS: string[] = [
  "High Contrast",
  "Low Contrast"
 ];
-
-// Bio-Slit assessments
-const BIO_SLIT_ASSESSMENTS: string[] = [
- "Biomicroscopy",
- "Slit Lamp Examination"
-];
-const BIO_SLIT_SPECIFY_OPTIONS: string[] = [
+const BIOSLIT_SPECIFY: string[] = [
  "(Change in Corneal Signs)",
  "(Corneal Haze)",
  "(Epithelial Defect)",
@@ -387,437 +297,84 @@ const BIO_SLIT_SPECIFY_OPTIONS: string[] = [
  "(Targeted)",
  "(Posterior capsule opacification)",
  "(Posterior capsulotomy evaluation)"
-
 ];
-const BIO_SLIT_METADATA_OPTIONS: string[] = [
-"Anterior capsule phimosis",
-"Anterior Chamber Cells",
-"Anterior Chamber Flare",
-"Anterior Chamber Synechiae",
-"Arcus Lipoides",
-"Bulbar Redness",
-"Chemosis",
-"Conjunctiva",
-"Conjunctival Compression/Indentation",
-"Conjunctival Edema",
-"Conjunctival Hyperemia",
-"Conjunctival Staining",
-"Cornea",
-"Corneal Edema",
-"Corneal Epithelial Edema",
-"Corneal Infiltrates",
-"Corneal Staining",
-"Corneal Stromal Edema",
-"Corneal Vascularization",
-"Keratic Precipitates",
-"Lens Opacity",
-"Lens Status",
-"Lids",
-"Limbal Hyperemia",
-"Microbial Keratitis",
-"Neovascularization and Stromal Haze",
-"Palpebral Conjunctival",
-"Posterior Chamber Synechiae",
-"Rueosis Iridis",
-"Subconjunctival Hemorrhage"
+const BIOSLIT_METADATA_MULTISELECT: string[] = [
+ "Anterior capsule phimosis",
+ "Anterior Chamber Cells",
+ "Anterior Chamber Flare",
+ "Anterior Chamber Synechiae",
+ "Arcus Lipoides",
+ "Bulbar Redness",
+ "Chemosis",
+ "Conjunctiva",
+ "Conjunctival Compression/Indentation",
+ "Conjunctival Edema",
+ "Conjunctival Hyperemia",
+ "Conjunctival Staining",
+ "Cornea",
+ "Corneal Edema",
+ "Corneal Epithelial Edema",
+ "Corneal Infiltrates",
+ "Corneal Staining",
+ "Corneal Stromal Edema",
+ "Corneal Vascularization",
+ "Keratic Precipitates",
+ "Lens Opacity",
+ "Lens Status",
+ "Lids",
+ "Limbal Hyperemia",
+ "Microbial Keratitis",
+ "Neovascularization and Stromal Haze",
+ "Palpebral Conjunctival",
+ "Posterior Chamber Synechiae",
+ "Rueosis Iridis",
+ "Subconjunctival Hemorrhage"
 ];
-
-// Habitual Assessments
-const HABITUAL_ASSESSMENTS: string[] = [
-  "Habitual Lens Usage"
-];
-
-const HABITUAL_METADATA: string[] = [
-"brand",
-"lens care brand",
-"manufacturer",
-"modality",
-"power",
-"wear success"
-]
-
-const REFRACTION_ASSESSMENTS: string[] = [
-"Manifest Refraction (MRSE)",
-"Cycloplegic Refraction",
-"Objective Refraction"
-]
-
-const REFRACTION_ALL_THAT_APPLY: string [] = [
-"Pre-fogging",
-"Post-fogging",
-"Jackson Cross Cylinder (JCC)",
-"Duochrome (Red-Green)",
-"Alternate Occlusion",
-"with Binocular Balancing (Prism)"
-]
-
-const REFRACTION_METADATA: string [] = [
-"Sphere",
-"Cylinder",
-"Axis",
-"ADD Power"
-]
-
-const ROV_ASSESSMENTS: string [] = [
-"Range of Vision",
-"Defocus Curve",
-"Depth of Focus"
-]
-
-
-const ROV_METHOD_OPTIONS: string[] = [
-  "Pre-fogging",
-  "Post-fogging",
-  "(Negative Defocus Range Only)"
-]
-
-const SUBJECTIVE_RATINGS_ASSESSMENTS: string [] = [
-  "Subjective Likert Questionnaire (5-Point Scale)",
-  "Subjective Ratings",
-  "Subjective Ratings (1-10 Scale)",
-  "Visual Analog Scale (VAS)",
-  "Subject Diary"
-]
-
-const SUBJECTIVE_RATINGS_SUBCAT: string [] = [
-"Agreement",
-"Ocular Comfort",
-"Satisfaction",
-"Preference"
-]
-
-const SUBJECTIVE_RATINGS_ALL_THAT_APPLY: string[] = [
-"All Day Confort",
-"Corneal Pain",
-"Ease of Insertion",
-"Ease of Removal",
-"End of Day Comfort",
-"Insertion Comfort",
-"Insertion Handling",
-"Insertion Vision",
-"Overall Comfort",
-"Overall Impression",
-"Overall Preference",
-"Overall Vision",
-"Quality of Vision",
-"Removal Handling",
-"Ghosting"
-]
-
-const SPC_ASSESSMENTS: string[] = [
-"Symptomatology Questionnaire",
-"Symptoms, Problems, and Complaints"
-]
-
-const SPC_METADATA_ALL_THAT_APPLY: string[] = [
-"Drop Burning",
-"Drop Stinging",
-"Burning",
-"Halo",
-"Stinging",
-"Itching",
-"Lens Awareness",
-"Dryness",
-"Discomfort",
-"Blurred Vision",
-"Fluctuating/Variable Vision",
-"Lens Needs Cleaning",
-"Redness",
-"Excessive Tearing",
-"Secretions",
-"Photophobia",
-"Other"
-]
-
-const LENS_FIT_ASSESSMENTS: string[] = [
-  "Lens Fit Assessments"
-]
-
-const LENS_FIT_SUBCAT: string[] = [
-  "Primary",
-  "Peripheral"
-]
-
-const LENS_FIT_ALL_THAT_APPLY: string[] = [
-  "Lens movement (overall fit)",
-  "Lens position (centration)"
-]
-
-const CS_ASSESSMNETS: string[] = [
-  "Contrast Sensitivity"
-]
-
-const CS_METHOD: string[] = [
-"Pelli-Robson",
-"Small Letter",
-"CSV 1000",
-"Add Custom",
-"Large Letter"
-]
-
-const CS_CORRECTION_OPTIONS: string[] = [
-"Best Corrected",
-"Uncorrected",
-"Corrected"
-]
-
-const CATARACT_ASSESSMENTS: string[] = [
-  "Cataract Grading"
-]
-
-const CATARACT_METHOD: string[] = [
-"Lens Opacities Classification System (LOCS)",
-"Wisconsin Grading System (WGS)",
-"Age-Related Eye Disease Study (AREDS)",
-"Simple Pre-Operative Nuclear Classification Score (SPONCS)",
-"Wilmer System",
-"Oxford System",
-"World Health Organization (WHO) Criteria",
-"Objective (Scheimpflug/OCT/SFR)"
-]
-
-
-const CATARACT_PARAMETERS: string[] = [
-"Nuclear Opalescence (NO)",
-"Nuclear Color (NC)",
-"Cortical Catarat (C)",
-"Posterior Subcapsular Cataracts (PSC)",
-"Vacoles"
-]
-
-const VF_ASSESSMENTS: string[] = [
-  "Visual Field Test"
-]
-
-const VF_METHODS: string[] = [
-  "(Humphrey Field Analyzer (HFA))",
-"(HS Octopus)",
-"(OCULUS)",
-"(Topcon)"
-]
-
-const SURGICAL_REPORT_ASSESSMENTS: string[] = [
-   "Surgical Report"
-]
-
-const SURGICAL_REPORT_ALL_THAT_APPLY: string[] = [
-  "Operating Eye",
-"Implanting Surgeon",
-"Lens Information",
-"Implant Success",
-"Surgical Problems",
-"Other Procedures at Surgery"
-]
-
-const SEVERITY_SCORE_ASSESSMENTS: string[] = [
-   "Severity Score"
-]
-
-const SEVERITY_SCORE_PARAMETER: string[] = [
-  "Halo",
-  "Starbursts",
-  "Glare",
-  "Add Custom"
-]
-
-
-const VISIT_NAME_OPTIONS: string[] = [
-  "Baseline",
-"Baseline/Dispense",
-"Baseline/Exposure",
-"Dispense",
-"Early Exit Visit",
-"Exposure",
-"Follow-Up",
-"Follow-Up Lens #/Dispense Lens #",
-"Follow-Up with Test",
-"N/A",
-"Screen/Baseline",
-"Screen/Baseline/Dispense",
-"Screen/Baseline/Dispense",
-"Screen/Baseline/Exposure",
-"Screen/Baseline/Fitting",
-"Screen/Baseline/In-Chair Comparison",
-"Screen/Exposure",
-"Screen/Trial Lens Fitting & Evaluation",
-"Screening",
-"Unscheduled Visit"
-]
-
-const LENS_OPTIONS: string[] = [
-"Lens 1",
-"Lens 2",
-"Lens 3",
-"Lens 4",
-"Lens 5",
-"N/A",
-]
-
-const TIMEPOINT_UNIT_OPTIONS: string[] = [
-"Hour",
-"Day",
-"Week",
-"Month"
-]
-
-const TIMEPOINT_VALUE_OPTIONS: string[] = []
-  for (let i =-1; i <=100; i++) {
-    TIMEPOINT_VALUE_OPTIONS.push(i.toString());
-  }
-
-const WINDOW_SIGN_OPTIONS: string[] = ["(+)", "(-)", "(+/-)"];
-
-const WINDOW_VALUE_OPTIONS: string[] = TIMEPOINT_VALUE_OPTIONS.slice();
-
-const WINDOW_UNIT_OPTIONS: string[] = [
-  "Minute(s)",
-"Hour(s)",
-"Day(s)",
-"Week(s)",
-"Month(s)"
-]
-
-
-
 const hasEyeDropdown = (name?: string): boolean =>
- !!name &&
- (
-   ASSESSMENTS_WITH_EYE.includes(name) ||
-   VISUAL_ACUITY_ASSESSMENTS.includes(name) ||
-   REFRACTION_ASSESSMENTS.includes(name) ||
-   ROV_ASSESSMENTS.includes(name) ||
-   SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name) ||
-   SPC_ASSESSMENTS.includes(name) ||
-   CS_ASSESSMNETS.includes(name) ||
-   CATARACT_ASSESSMENTS.includes(name) ||
-   VF_ASSESSMENTS.includes(name) ||
-   SURGICAL_REPORT_ASSESSMENTS.includes(name)
- );
+ !!name && (ASSESSMENTS_WITH_EYE.includes(name) || VISUAL_ACUITY_ASSESSMENTS.includes(name));
 const isVisualAcuityAssessment = (name?: string): boolean =>
  !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
-const isBioSlitAssessment = (name?: string): boolean =>
- !!name && BIO_SLIT_ASSESSMENTS.includes(name);
-const isHabitualAssessment = (name?: string): boolean =>
- !!name && HABITUAL_ASSESSMENTS.includes(name);
-const isRefractionAssessment = (name?: string): boolean =>
- !!name && REFRACTION_ASSESSMENTS.includes(name);
-const isROVAssessment = (name?: string): boolean =>
-  !!name && ROV_ASSESSMENTS.includes(name);
-const isSubjectiveAssessment = (name?: string): boolean =>
-  !!name && SUBJECTIVE_RATINGS_ASSESSMENTS.includes(name)
-const isSPCAssessment = (name?: string): boolean =>
-  !!name && SPC_ASSESSMENTS.includes(name)
-const isLensFitAssessment = (name?: string): boolean =>
-  !!name && LENS_FIT_ASSESSMENTS.includes(name)
-const isCSAssessment = (name?: string): boolean =>
-  !!name && CS_ASSESSMNETS.includes(name)
-const isCataractAssessment = (name?: string): boolean =>
-  !!name && CATARACT_ASSESSMENTS.includes(name)
-const isVFAssessment = (name?: string): boolean =>
-  !!name && VF_ASSESSMENTS.includes(name)
-const isSurgicalReportAssessment = (name?: string): boolean =>
-  !!name && SURGICAL_REPORT_ASSESSMENTS.includes(name)
-const isSeverityScoreAssessment = (name?: string): boolean =>
-  !!name && SEVERITY_SCORE_ASSESSMENTS.includes(name)
-
+const isBioslitAssessment = (name?: string): boolean =>
+ !!name && BIOSLIT_ASSESSMENTS.includes(name);
+// ✅ UPDATED: supports custom assessment rows
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
+ if (meta.IsCustom) return meta.CustomAssessment ?? "";
  if (!meta.AssessmentName) return "";
  const parts: string[] = [];
- // Order: Eye, Correction, Notation, Distance, Lighting, Contrast
-  if(meta.SurgicalReportAllThatApply && meta.SurgicalReportAllThatApply.length) {
-  parts.push(meta.SurgicalReportAllThatApply.join(", "))
- }
- if(meta.VFMethod) parts.push(meta.VFMethod)
- if (meta.CataractMehod) parts.push(meta.CataractMehod);
- if(meta.CataractParameters && meta.CataractParameters.length) {
-  parts.push(meta.CataractParameters.join(", "))
- }
- if (meta.SubjectiveRatingsSubCat) parts.push(meta.SubjectiveRatingsSubCat);
- if(meta.SubjectiveRatingsAllThatApply && meta.SubjectiveRatingsAllThatApply.length) {
-  parts.push(meta.SubjectiveRatingsAllThatApply.join(", "))
- }
  if (meta.Eye) parts.push(meta.Eye);
- if (meta.BioSlitSpecify) parts.push(meta.BioSlitSpecify);
- if(meta.RefractionAllThatApply && meta.RefractionAllThatApply.length) {
-  parts.push(meta.RefractionAllThatApply.join(", "))
- }
- if (meta.ROVMethod && meta.ROVMethod.length) {
-  parts.push(meta.ROVMethod.join(", "));
- }
- if(meta.ROVRange) parts.push(meta.ROVRange);
-
- if (meta.CSMethod === "Add Custom" && meta.CSMethodCustom) {
-  // show the custom text instead of the literal "Add Custom"
-  parts.push(meta.CSMethodCustom);
- } else if (meta.CSMethod) {
-  parts.push(meta.CSMethod);
- }
-
-  if (meta.SeverityscoreParameter === "Add Custom" && meta.SeverityScoreCustomParameter) {
-  // show the custom text instead of the literal "Add Custom"
-  parts.push(meta.SeverityScoreCustomParameter);
- } else if (meta.SeverityscoreParameter) {
-  parts.push(meta.SeverityscoreParameter);
- }
  if (meta.Correction) parts.push(meta.Correction);
  if (meta.Notation) parts.push(meta.Notation);
  if (meta.Distance) parts.push(meta.Distance);
  if (meta.Lighting) parts.push(meta.Lighting);
  if (meta.Contrast) parts.push(meta.Contrast);
- if (meta.LensFitSubCat) parts.push(meta.LensFitSubCat);
- if (meta.LensFitAllThatApply && meta.LensFitAllThatApply.length) {
-  parts.push(meta.LensFitAllThatApply.join(", "))
- }
- if (parts.length === 0) {
-   return meta.AssessmentName;
- }
- // "AssessmentName Eye, Correction, Notation, Distance, Lighting, Contrast"
+ if (meta.Specify_Bioslit) parts.push(meta.Specify_Bioslit);
+ if (parts.length === 0) return meta.AssessmentName;
  return `${meta.AssessmentName} ${parts.join(", ")}`;
 };
-
-
-
-const formatVisitHeader = (meta: VisitMeta): string => {
- const lines: string[] = [];
- // 1) Visit Number
- if (meta.VisitNumber) {
-   lines.push(meta.VisitNumber);
- }
- // 2) Visit Name (+ /Exit if toggle is on)
- if (meta.VisitName) {
-   lines.push(meta.VisitName);
- }
- // 3) Lens
- if (meta.Lens) {
-   lines.push(`${meta.Lens}`);
- }
- // 4) Timepoint
- if (meta.TimepointUnit && meta.TimepointValue) {
-   lines.push(`${meta.TimepointUnit} ${meta.TimepointValue}`);
- }
- // 5) Window
- if (meta.WindowSign && meta.WindowValue && meta.WindowUnit) {
-   lines.push(`${meta.WindowSign} ${meta.WindowValue} ${meta.WindowUnit}`);
- }
- // Exit
-  const exitSuffix = meta.Exit ? "/Exit" : "";
-  lines.push(exitSuffix)
- return lines.join("\n"); // "\n" so you *can* show each on new line
-};
-
-
-// ---------- DEFAULT TABLE & PARSING ----------
 const DEFAULT_COLUMNS = ["", ""];
-const DEFAULT_ROWS: Row[] = [
- { RowHeader: "", Cells: ["", ""] },
- { RowHeader: "", Cells: ["", ""] }
+// ✅ NEW: default 5 assessment rows on first load
+const DEFAULT_ASSESSMENTS: string[] = [
+ "Adverse Event(s)",
+ "Demographics",
+ "Inclusion / Exclusion Criteria",
+ "Informed Consent",
+ "Medical History and Concomitant Medications"
 ];
+const DEFAULT_ROWS: Row[] = DEFAULT_ASSESSMENTS.map(() => ({
+ RowHeader: "",
+ Cells: ["", ""]
+}));
+const DEFAULT_ASSESSMENT_META: AssessmentMeta[] = DEFAULT_ASSESSMENTS.map(a => ({
+ AssessmentName: a,
+ IsCustom: false,
+ Metadata_Bioslit: []
+}));
 const DEFAULT_TABLE: TablePayload = {
  Columns: DEFAULT_COLUMNS,
  Rows: DEFAULT_ROWS,
  VisitMeta: [],
- AssessmentMeta: [],
- AssessmentNames: []
+ AssessmentMeta: DEFAULT_ASSESSMENT_META,
+ AssessmentNames: DEFAULT_ASSESSMENTS
 };
 function normalizePayload(obj: Partial<TablePayload>): TablePayload {
  const cols = Array.isArray(obj.Columns) && obj.Columns.length > 0 ? obj.Columns : DEFAULT_COLUMNS;
@@ -827,7 +384,10 @@ function normalizePayload(obj: Partial<TablePayload>): TablePayload {
          RowHeader: r.RowHeader ?? "",
          Cells: Array.isArray(r.Cells) ? r.Cells : Array(cols.length).fill("")
        }))
-     : DEFAULT_ROWS;
+     : DEFAULT_ROWS.map(r => ({
+         RowHeader: r.RowHeader,
+         Cells: Array(cols.length).fill("")
+       }));
  const normRows = rows.map(r => ({
    RowHeader: r.RowHeader ?? "",
    Cells: (r.Cells || []).slice(0, cols.length).concat(
@@ -837,13 +397,12 @@ function normalizePayload(obj: Partial<TablePayload>): TablePayload {
  const visitMeta = Array.isArray(obj.VisitMeta) ? obj.VisitMeta : [];
  const assessmentMeta = Array.isArray(obj.AssessmentMeta) ? obj.AssessmentMeta : [];
  const assessmentNames = Array.isArray(obj.AssessmentNames) ? obj.AssessmentNames : undefined;
-
  return {
    Columns: cols,
    Rows: normRows,
    VisitMeta: visitMeta,
    AssessmentMeta: assessmentMeta,
-  AssessmentNames: assessmentNames
+   AssessmentNames: assessmentNames
  };
 }
 function parsePayload(raw?: string): TablePayload {
@@ -860,54 +419,71 @@ type PaneState =
  | { mode: "column"; index: number }
  | { mode: "row"; index: number }
  | null;
-// ---------- COMPONENT ----------
+// -------------------- Component --------------------
 export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
  const [columns, setColumns] = React.useState<string[]>(DEFAULT_TABLE.Columns);
  const [rows, setRows] = React.useState<Row[]>(DEFAULT_TABLE.Rows);
  const [visitMeta, setVisitMeta] = React.useState<VisitMeta[]>([]);
  const [assessmentMeta, setAssessmentMeta] = React.useState<AssessmentMeta[]>([]);
  const [pane, setPane] = React.useState<PaneState>(null);
- // hydrate from incoming JSON whenever it changes
+ // ✅ bioslit dropdown open index must live INSIDE component
+ const [openBioSlitMenuIndex, setOpenBioSlitMenuIndex] = React.useState<number | null>(null);
+ // ✅ NEW: searchable assessment picker state (per open pane)
+ const [assessmentSearch, setAssessmentSearch] = React.useState<string>("");
+ const [assessmentDropdownOpen, setAssessmentDropdownOpen] = React.useState<boolean>(false);
+ // ✅ NEW: custom assessment mode state
+ const [customModeRowIndex, setCustomModeRowIndex] = React.useState<number | null>(null);
+ const [customAssessmentText, setCustomAssessmentText] = React.useState<string>("");
+ // Re-hydrate from JSON
  React.useEffect(() => {
    const parsed = parsePayload(initialJson);
    setColumns(parsed.Columns);
    setRows(parsed.Rows);
    setVisitMeta(parsed.VisitMeta || []);
    setAssessmentMeta(parsed.AssessmentMeta || []);
+   // ✅ If initialJson is empty, ensure row headers are populated for defaults
+   if (!initialJson || initialJson.trim() === "") {
+     setRows(prev => {
+       const updated = [...prev];
+       const meta = parsed.AssessmentMeta || DEFAULT_ASSESSMENT_META;
+       for (let i = 0; i < updated.length; i++) {
+         const m = meta[i] || {};
+         updated[i] = { ...updated[i], RowHeader: formatAssessmentHeader(m) };
+       }
+       return updated;
+     });
+   }
  }, [initialJson]);
- // push changes outward
-React.useEffect(() => {
- const assessmentNames = assessmentMeta
-   .map(m => m.AssessmentName)
-   .filter((x): x is string => !!x);
- const payload: TablePayload = {
-   Columns: columns,
-   Rows: rows,
-   VisitMeta: visitMeta,
-   AssessmentMeta: assessmentMeta,
-   AssessmentNames: assessmentNames
- };
- onChange(JSON.stringify(payload));
-}, [columns, rows, visitMeta, assessmentMeta, onChange]);
- // --- basic table operations ---
+ // keep JSON in sync
+ React.useEffect(() => {
+   const assessmentNames = assessmentMeta
+     .map(m => m.AssessmentName)
+     .filter((x): x is string => !!x);
+   const payload: TablePayload = {
+     Columns: columns,
+     Rows: rows,
+     VisitMeta: visitMeta,
+     AssessmentMeta: assessmentMeta,
+     AssessmentNames: assessmentNames
+   };
+   onChange(JSON.stringify(payload));
+ }, [columns, rows, visitMeta, assessmentMeta, onChange]);
+ // ✅ highlight indices derived from pane
+ const selectedColIndex = pane?.mode === "column" ? pane.index : null;
+ const selectedRowIndex = pane?.mode === "row" ? pane.index : null;
+ // -------------------- helpers --------------------
  const addColumn = () => {
-   const newColName = "";
-   setColumns(prev => [...prev, newColName]);
+   setColumns(prev => [...prev, ""]);
    setRows(prev => prev.map(r => ({ ...r, Cells: [...r.Cells, ""] })));
    setVisitMeta(prev => [...prev, {}]);
  };
  const addRow = () => {
    setRows(prev => [...prev, { RowHeader: "", Cells: Array(columns.length).fill("") }]);
-   setAssessmentMeta(prev => [...prev, {}]);
+   setAssessmentMeta(prev => [...prev, { Metadata_Bioslit: [] }]);
  };
  const removeColumn = (i: number) => {
    setColumns(prev => prev.filter((_, idx) => idx !== i));
-   setRows(prev =>
-     prev.map(r => ({
-       ...r,
-       Cells: r.Cells.filter((_, idx) => idx !== i)
-     }))
-   );
+   setRows(prev => prev.map(r => ({ ...r, Cells: r.Cells.filter((_, idx) => idx !== i) })));
    setVisitMeta(prev => prev.filter((_, idx) => idx !== i));
    setPane(p => (p && p.mode === "column" && p.index === i ? null : p));
  };
@@ -915,6 +491,7 @@ React.useEffect(() => {
    setRows(prev => prev.filter((_, idx) => idx !== i));
    setAssessmentMeta(prev => prev.filter((_, idx) => idx !== i));
    setPane(p => (p && p.mode === "row" && p.index === i ? null : p));
+   setCustomModeRowIndex(prev => (prev === i ? null : prev));
  };
  const setCell = (rIndex: number, cIndex: number, v: string) => {
    setRows(prev => {
@@ -965,773 +542,118 @@ React.useEffect(() => {
      return arr;
    });
  };
-const updateVisitMeta = (index: number, patch: Partial<VisitMeta>) => {
- setVisitMeta(prev => {
-   const arr = [...prev];
-   const current = arr[index] || {};
-   const updated: VisitMeta = { ...current, ...patch };
-   arr[index] = updated;
-   const headerText = formatVisitHeader(updated);
-   setColumns(prevCols => {
-     const cols = [...prevCols];
-     cols[index] = headerText;
-     return cols;
+ // Visit pane update
+ const updateVisitMeta = (index: number, patch: Partial<VisitMeta>) => {
+   setVisitMeta(prev => {
+     const arr = [...prev];
+     const current = arr[index] || {};
+     const updated: VisitMeta = { ...current, ...patch };
+     arr[index] = updated;
+     const headerText = [updated.VisitNumber, updated.VisitName].filter(Boolean).join(" - ");
+     setColumns(prevCols => {
+       const cols = [...prevCols];
+       cols[index] = headerText;
+       return cols;
+     });
+     return arr;
    });
-   return arr;
- });
-};
-const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => {
- setAssessmentMeta(prev => {
-   const arr = [...prev];
-   const current = arr[index] || {};
-   let updated: AssessmentMeta = { ...current, ...patch };
-   // If AssessmentName changed, reset dependent fields
-   if (patch.AssessmentName !== undefined) {
-     updated = {
-       AssessmentName: patch.AssessmentName,
-       Eye: undefined,
-       Correction: undefined,
-       Notation: undefined,
-       Distance: undefined,
-       Lighting: undefined,
-       Contrast: undefined,
-       BioSlitSpecify: undefined,
-       BioSlitMetadata: [],
-       HabitualMetadata: [],
-       RefractionAllThatApply: [],
-       RefractionMetadata: [],
-       ROVMethod: [],
-       ROVRange: undefined,
-       SubjectiveRatingsSubCat: undefined,
-       SubjectiveRatingsAllThatApply: [],
-       SPCMetadata: [],
-       LensFitSubCat: undefined,
-       LensFitAllThatApply: [],
-       CSMethod: undefined,
-       CSMethodCustom: undefined,
-       CataractMehod: undefined,
-       CataractParameters: [],
-       VFMethod: undefined,
-       SurgicalReportAllThatApply: [],
-       SeverityScoreCustomParameter: undefined,
-       SeverityscoreParameter: undefined
-     };
-   }
-
-   arr[index] = updated;
-   const headerText = formatAssessmentHeader(updated);
-   setRows(prevRows => {
-     const rowsCopy = [...prevRows];
-     const row = rowsCopy[index] || { RowHeader: "", Cells: Array(columns.length).fill("") };
-     rowsCopy[index] = { ...row, RowHeader: headerText };
-     return rowsCopy;
+ };
+ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => {
+   setAssessmentMeta(prev => {
+     const arr = [...prev];
+     const current = arr[index] || { Metadata_Bioslit: [] };
+     let updated: AssessmentMeta = { ...current, ...patch };
+     // If AssessmentName changed, reset dependent fields (keep your prior behavior)
+     if (patch.AssessmentName !== undefined) {
+       updated = {
+         AssessmentName: patch.AssessmentName,
+         Eye: undefined,
+         Correction: undefined,
+         Notation: undefined,
+         Distance: undefined,
+         Lighting: undefined,
+         Contrast: undefined,
+         Specify_Bioslit: undefined,
+         Metadata_Bioslit: [],
+         IsCustom: false,
+         CustomAssessment: undefined
+       };
+     }
+     // If switching to custom
+     if (patch.IsCustom) {
+       updated = {
+         IsCustom: true,
+         CustomAssessment: patch.CustomAssessment ?? updated.CustomAssessment ?? "",
+         Metadata_Bioslit: [],
+         AssessmentName: undefined,
+         Eye: undefined,
+         Correction: undefined,
+         Notation: undefined,
+         Distance: undefined,
+         Lighting: undefined,
+         Contrast: undefined,
+         Specify_Bioslit: undefined
+       };
+     }
+     arr[index] = updated;
+     const headerText = formatAssessmentHeader(updated);
+     setRows(prevRows => {
+       const rowsCopy = [...prevRows];
+       const row = rowsCopy[index] || { RowHeader: "", Cells: Array(columns.length).fill("") };
+       rowsCopy[index] = { ...row, RowHeader: headerText };
+       return rowsCopy;
+     });
+     return arr;
    });
-   return arr;
- });
-};
- // ---------- PANE RENDERING ----------
+ };
+ // -------------------- Searchable assessment picker --------------------
+ const filteredAssessmentOptions = React.useMemo(() => {
+   const q = assessmentSearch.trim().toLowerCase();
+   if (!q) return ASSESSMENT_OPTIONS;
+   return ASSESSMENT_OPTIONS.filter(opt => opt.toLowerCase().includes(q));
+ }, [assessmentSearch]);
+ // -------------------- Render pane --------------------
  const renderPane = () => {
    if (!pane) return null;
-     if (pane.mode === "column") {
- const vm = visitMeta[pane.index] || {};
- return (
-<div className="dm-pane">
-<div className="dm-pane-content">
-<div className="dm-pane-header">
-<h3>Build Visit (Column {pane.index + 1})</h3>
-<button
-           type="button"
-           className="dm-pane-close"
-           onClick={() => setPane(null)}
->
-           ×
-</button>
-</div>
-       {/* Visit Number (unchanged) */}
-<div className="dm-pane-field">
-<label>Visit Number</label>
-<select
-           value={vm.VisitNumber ?? ""}
-           onChange={e =>
-             updateVisitMeta(pane.index, { VisitNumber: e.target.value })
-           }
->
-<option value=""></option>
-<option value="Visit 00">Visit 00</option>
-<option value="Visit 0">Visit 0</option>
-<option value="Visit 1">Visit 1</option>
-<option value="Visit 2">Visit 2</option>
-<option value="Visit 3">Visit 3</option>
-<option value="Visit 4">Visit 4</option>
-<option value="Visit 5">Visit 5</option>
-<option value="Visit 6">Visit 6</option>
-<option value="Visit 7">Visit 7</option>
-<option value="Visit 8">Visit 8</option>
-<option value="Visit 9">Visit 9</option>
-<option value="Visit 10">Visit 10</option>
-<option value="Visit 11">Visit 11</option>
-<option value="Visit 12">Visit 12</option>
-<option value="Visit 13">Visit 13</option>
-<option value="Visit 14">Visit 14</option>
-<option value="Visit 15">Visit 15</option>
-<option value="Visit 16">Visit 16</option>
-<option value="Visit 17">Visit 17</option>
-<option value="Visit 18">Visit 18</option>
-<option value="Visit 19">Visit 19</option>
-<option value="Visit 20">Visit 20</option>
-</select>
-</div>
-       {/* Visit Name – NEW options */}
-<div className="dm-pane-field">
-<label>Visit Name</label>
-<select
-           value={vm.VisitName ?? ""}
-           onChange={e =>
-             updateVisitMeta(pane.index, { VisitName: e.target.value })
-           }
->
-<option value=""></option>
-           {VISIT_NAME_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-               {opt}
-</option>
-           ))}
-</select>
-</div>
-       {/* Lens */}
-<div className="dm-pane-field">
-<label>Lens</label>
-<select
-           value={vm.Lens ?? ""}
-           onChange={e =>
-             updateVisitMeta(pane.index, { Lens: e.target.value })
-           }
->
-<option value=""></option>
-           {LENS_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-               {opt}
-</option>
-           ))}
-</select>
-</div>
-       {/* Timepoint: [Unit] [Value] */}
-<div className="dm-pane-field">
-<label>Timepoint</label>
-<div className="dm-inline-group">
-<select
-             value={vm.TimepointUnit ?? ""}
-             onChange={e =>
-               updateVisitMeta(pane.index, { TimepointUnit: e.target.value })
-             }
->
-<option value=""></option>
-             {TIMEPOINT_UNIT_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                 {opt}
-</option>
-             ))}
-</select>
-<select
-             value={vm.TimepointValue ?? ""}
-             onChange={e =>
-               updateVisitMeta(pane.index, { TimepointValue: e.target.value })
-             }
->
-<option value=""></option>
-             {TIMEPOINT_VALUE_OPTIONS.map(v => (
-<option key={v} value={v}>
-                 {v}
-</option>
-             ))}
-</select>
-</div>
-</div>
-       {/* Window: [Sign] [Value] [Unit] */}
-<div className="dm-pane-field">
-<label>Window</label>
-<div className="dm-inline-group">
-<select
-             value={vm.WindowSign ?? ""}
-             onChange={e =>
-               updateVisitMeta(pane.index, { WindowSign: e.target.value })
-             }
->
-<option value=""></option>
-             {WINDOW_SIGN_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                 {opt}
-</option>
-             ))}
-</select>
-<select
-             value={vm.WindowValue ?? ""}
-             onChange={e =>
-               updateVisitMeta(pane.index, { WindowValue: e.target.value })
-             }
->
-<option value=""></option>
-             {WINDOW_VALUE_OPTIONS.map(v => (
-<option key={v} value={v}>
-                 {v}
-</option>
-             ))}
-</select>
-<select
-             value={vm.WindowUnit ?? ""}
-             onChange={e =>
-               updateVisitMeta(pane.index, { WindowUnit: e.target.value })
-             }
->
-<option value=""></option>
-             {WINDOW_UNIT_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                 {opt}
-</option>
-             ))}
-</select>
-</div>
-</div>
-       {/* Exit toggle */}
-<div className="dm-pane-field">
-<label>Exit?</label>
-<label className="dm-toggle">
-<input
-             type="checkbox"
-             checked={!!vm.Exit}
-             onChange={e =>
-               updateVisitMeta(pane.index, { Exit: e.target.checked })
-             }
-           />
-<span className="dm-toggle-slider" />
-</label>
-</div>
-<div className="dm-pane-footer">
-<button type="button" onClick={() => setPane(null)}>
-           Save & Close
-</button>
-</div>
-</div>
-</div>
- );
-}
-   if (pane.mode === "row") {
-     const am = assessmentMeta[pane.index] || {};
-     const showEye = hasEyeDropdown(am.AssessmentName);
-     const isVA = isVisualAcuityAssessment(am.AssessmentName);
-     const isBioSlit = isBioSlitAssessment(am.AssessmentName);
-     const isHabitual = isHabitualAssessment(am.AssessmentName);
-     const isRefraction = isRefractionAssessment(am.AssessmentName);
-     const isROV = isROVAssessment(am.AssessmentName);
-     const isSubjective = isSubjectiveAssessment(am.AssessmentName);
-     const isSPC = isSPCAssessment(am.AssessmentName);
-     const isLensFit = isLensFitAssessment(am.AssessmentName);
-     const isCS = isCSAssessment(am.AssessmentName);
-     const isCataract = isCataractAssessment(am.AssessmentName);
-     const isVF = isVFAssessment(am.AssessmentName);
-     const isSurgicalReport = isSurgicalReportAssessment(am.AssessmentName);
-     const isSeverityScore = isSeverityScoreAssessment(am.AssessmentName)
+   // -------------------- Column pane --------------------
+   if (pane.mode === "column") {
+     const vm = visitMeta[pane.index] || {};
      return (
 <div className="dm-pane">
 <div className="dm-pane-content">
 <div className="dm-pane-header">
-<h3>Build Assessment (Row {pane.index + 1})</h3>
+<h3>Visit Details</h3>
 <button type="button" className="dm-pane-close" onClick={() => setPane(null)}>
                ×
 </button>
 </div>
 <div className="dm-pane-field">
-<label>Assessment Name</label>
+<label>Visit Number</label>
 <select
-               value={am.AssessmentName ?? ""}
-               onChange={e => updateAssessmentMeta(pane.index, { AssessmentName: e.target.value })}
+               value={vm.VisitNumber ?? ""}
+               onChange={e => updateVisitMeta(pane.index, { VisitNumber: e.target.value })}
 >
 <option value=""></option>
-               {ASSESSMENT_OPTIONS.map(name => (
-<option key={name} value={name}>
-                   {name}
+               {Array.from({ length: 21 }, (_, i) => i).map(i => (
+<option key={i} value={`Visit ${i}`}>
+                   {`Visit ${i}`}
 </option>
                ))}
+<option value="Visit 00">Visit 00</option>
 </select>
 </div>
-           {showEye && (
 <div className="dm-pane-field">
-<label>Eye</label>
+<label>Visit Name</label>
 <select
-                 value={am.Eye ?? ""}
-                 onChange={e => updateAssessmentMeta(pane.index, { Eye: e.target.value })}
+               value={vm.VisitName ?? ""}
+               onChange={e => updateVisitMeta(pane.index, { VisitName: e.target.value })}
 >
 <option value=""></option>
-                 {EYE_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                     {opt}
-</option>
-                 ))}
+<option value="Baseline">Baseline</option>
+<option value="Lens">Lens</option>
+<option value="Exit">Exit</option>
 </select>
 </div>
-           )}
-           {isVA && (
-<>
-<div className="dm-pane-field">
-<label>Correction</label>
-<select
-                   value={am.Correction ?? ""}
-                   onChange={e => updateAssessmentMeta(pane.index, { Correction: e.target.value })}
->
-<option value=""></option>
-                   {CORRECTION_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                       {opt}
-</option>
-                   ))}
-</select>
-</div>
-<div className="dm-pane-field">
-<label>Notation</label>
-<select
-                   value={am.Notation ?? ""}
-                   onChange={e => updateAssessmentMeta(pane.index, { Notation: e.target.value })}
->
-<option value=""></option>
-                   {NOTATION_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                       {opt}
-</option>
-                   ))}
-</select>
-</div>
-<div className="dm-pane-field">
-<label>Distance</label>
-<select
-                   value={am.Distance ?? ""}
-                   onChange={e => updateAssessmentMeta(pane.index, { Distance: e.target.value })}
->
-<option value=""></option>
-                   {DISTANCE_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                       {opt}
-</option>
-                   ))}
-</select>
-</div>
-<div className="dm-pane-field">
-<label>Lighting</label>
-<select
-                   value={am.Lighting ?? ""}
-                   onChange={e => updateAssessmentMeta(pane.index, { Lighting: e.target.value })}
->
-<option value=""></option>
-                   {LIGHTING_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                       {opt}
-</option>
-                   ))}
-</select>
-</div>
-<div className="dm-pane-field">
-<label>Contrast</label>
-<select
-                   value={am.Contrast ?? ""}
-                   onChange={e => updateAssessmentMeta(pane.index, { Contrast: e.target.value })}
->
-<option value=""></option>
-                   {CONTRAST_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-                       {opt}
-</option>
-                   ))}
-</select>
-</div>
-</>
-           )}
-
-     {isRefraction && (
-<>
-   {/* (a) Select all that apply - Refraction (multi-select, shows in header) */}
-<MultiSelect
- label="Select All that Apply"
- options={REFRACTION_ALL_THAT_APPLY}
- selected={am.RefractionAllThatApply || []}
- onChange={next => updateAssessmentMeta(pane.index, { RefractionAllThatApply: next })}
-/>
-   {/* (c) Metadata – multi-select stored in JSON only, not shown in header */}
-   {/* Metadata (multi-select, checkboxes, NOT in header) */}
-<MultiSelect
- label="Metadata"
- options={REFRACTION_METADATA}
- selected={am.RefractionMetadata}
- onChange={next => updateAssessmentMeta(pane.index, { RefractionMetadata: next })}
-/>
-</>
-)}  
-
-     {isBioSlit && (
-<>
-   {/* Specify (single-select, goes into header) */}
-<div className="dm-pane-field">
-<label>Specify</label>
-<select
-       value={am.BioSlitSpecify ?? ""}
-       onChange={e => updateAssessmentMeta(pane.index, { BioSlitSpecify: e.target.value })}
->
-<option value=""></option>
-       {BIO_SLIT_SPECIFY_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-   {/* Metadata (multi-select, checkboxes, NOT in header) */}
-<MultiSelect
- label="Metadata"
- options={BIO_SLIT_METADATA_OPTIONS}
- selected={am.BioSlitMetadata}
- onChange={next => updateAssessmentMeta(pane.index, { BioSlitMetadata: next })}
-/>
-</>
-)}
-
-     {isHabitual && (
-<>
-   {/* Metadata for Habiutal (multi-select, checkboxes, NOT in header) */}
-<MultiSelect
- label="Metadata"
- options={HABITUAL_METADATA}
- selected={am.HabitualMetadata}
- onChange={next => updateAssessmentMeta(pane.index, { HabitualMetadata: next })}
-/>
-</>
-)}
-
-     {isROV && (
-<>
-   {/* (a) Method – select all that apply (multi-select, appears in header) */}
-<MultiSelect
-     label="Method – Select all that apply"
-     options={ROV_METHOD_OPTIONS}
-     selected={am.ROVMethod || []}
-     onChange={next =>
-       updateAssessmentMeta(pane.index, { ROVMethod: next })
-     }
-   />
-   {/* (c) Enter Range – free text */}
-<div className="dm-pane-field">
-<label>Enter Range</label>
-<input
-       type="text"
-       className="dm-input"
-       placeholder="Ex: -5.00 to +0.25 DS"
-       value={am.ROVRange ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { ROVRange: e.target.value })
-       }
-     />
-</div>
-   {/* (d) Lighting – reuse existing Lighting dropdown */}
-<div className="dm-pane-field">
-<label>Lighting</label>
-<select
-       value={am.Lighting ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { Lighting: e.target.value })
-       }
->
-<option value=""></option>
-       {LIGHTING_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-</>
-)}
-
-
-     {isSubjective && (
-<>
-   {/* (a) Subcategory */}
-<div className="dm-pane-field">
-<label>Sub Category</label>
-<select
-       value={am.SubjectiveRatingsSubCat ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { SubjectiveRatingsSubCat: e.target.value })
-       }
->
-<option value=""></option>
-       {SUBJECTIVE_RATINGS_SUBCAT.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-
-   {/* (b) Method – select all that apply (multi-select, appears in header) */}
-<MultiSelect
-     label="Select all that apply"
-     options={SUBJECTIVE_RATINGS_ALL_THAT_APPLY}
-     selected={am.SubjectiveRatingsAllThatApply || []}
-     onChange={next =>
-       updateAssessmentMeta(pane.index, { SubjectiveRatingsAllThatApply: next })
-     }
-   />
-
-</>
-)}
-
-     {isSPC && (
-<>
-   {/* Metadata (multi-select, checkboxes, NOT in header) */}
-<MultiSelect
- label="Metadata"
- options={SPC_METADATA_ALL_THAT_APPLY}
- selected={am.SPCMetadata}
- onChange={next => updateAssessmentMeta(pane.index, { SPCMetadata: next })}
-/>
-</>
-)} 
-
-
-     {isLensFit && (
-<>
-   {/* (a) Subcategory */}
-<div className="dm-pane-field">
-<label>Sub Category</label>
-<select
-       value={am.LensFitSubCat ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { LensFitSubCat: e.target.value })
-       }
->
-<option value=""></option>
-       {LENS_FIT_SUBCAT.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-
-   {/* (b) Method – select all that apply (multi-select, appears in header) */}
-<MultiSelect
-     label="Select all that apply"
-     options={LENS_FIT_ALL_THAT_APPLY}
-     selected={am.LensFitAllThatApply || []}
-     onChange={next =>
-       updateAssessmentMeta(pane.index, { LensFitAllThatApply: next })
-     }
-   />
-
-</>
-)}
-
-
-     {isCS && (
-<>
-   {/* 1. Method */}
-<div className="dm-pane-field">
-<label>Method</label>
-<select
-       value={am.CSMethod ?? ""}
-       onChange={e => {
-         const value = e.target.value;
-         // if method changes away from Add Custom, clear custom text
-         if (value !== "Add Custom") {
-           updateAssessmentMeta(pane.index, {
-             CSMethod: value,
-             CSMethodCustom: undefined
-           });
-         } else {
-           updateAssessmentMeta(pane.index, {
-             CSMethod: value
-           });
-         }
-       }}
->
-<option value=""></option>
-       {CS_METHOD.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-   {/* 2. Custom method text, only when "Add Custom" selected */}
-   {am.CSMethod === "Add Custom" && (
-<div className="dm-pane-field">
-<label>Add Custom</label>
-<input
-         type="text"
-         className="dm-input"
-         placeholder="Enter custom method"
-         value={am.CSMethodCustom ?? ""}
-         onChange={e =>
-           updateAssessmentMeta(pane.index, { CSMethodCustom: e.target.value })
-         }
-       />
-</div>
-   )}
-   {/* 3. Correction (Best Corrected / Uncorrected / Corrected) */}
-<div className="dm-pane-field">
-<label>Correction</label>
-<select
-       value={am.Correction ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { Correction: e.target.value })
-       }
->
-<option value=""></option>
-       {CS_CORRECTION_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-   {/* 4. Lighting – reuse existing lighting options */}
-<div className="dm-pane-field">
-<label>Lighting</label>
-<select
-       value={am.Lighting ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { Lighting: e.target.value })
-       }
->
-<option value=""></option>
-       {LIGHTING_OPTIONS.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-   {/* 5. Eye comes from the existing showEye block above (no extra code needed) */}
-</>
-)}
-
-
-     {isCataract && (
-<>
-   {/* (a) Method */}
-<div className="dm-pane-field">
-<label>Method</label>
-<select
-       value={am.CataractMehod ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { CataractMehod: e.target.value })
-       }
->
-<option value=""></option>
-       {CATARACT_METHOD.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-
-   {/* (b) Parameters – select all that apply (multi-select, appears in header) */}
-<MultiSelect
-     label="Parameters (All that Apply)"
-     options={CATARACT_PARAMETERS}
-     selected={am.CataractParameters || []}
-     onChange={next =>
-       updateAssessmentMeta(pane.index, { CataractParameters: next })
-     }
-   />
-
-</>
-)}
-
-     {isVF && (
-<>
-   {/* (a) Method */}
-<div className="dm-pane-field">
-<label>Method</label>
-<select
-       value={am.VFMethod ?? ""}
-       onChange={e =>
-         updateAssessmentMeta(pane.index, { VFMethod: e.target.value })
-       }
->
-<option value=""></option>
-       {VF_METHODS.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-</>
-)}
-
-
-     {isSurgicalReport && (
-<>
-   {/* (b) All that Apply – select all that apply (multi-select, appears in header) */}
-<MultiSelect
-     label="Select All that Apply"
-     options={SURGICAL_REPORT_ALL_THAT_APPLY}
-     selected={am.SurgicalReportAllThatApply || []}
-     onChange={next =>
-       updateAssessmentMeta(pane.index, { SurgicalReportAllThatApply: next })
-     }
-   />
-</>
-)}
-
-
-     {isSeverityScore && (
-<>
-   {/* 1. Method */}
-<div className="dm-pane-field">
-<label>Parameter</label>
-<select
-       value={am.SeverityscoreParameter ?? ""}
-       onChange={e => {
-         const value = e.target.value;
-         // if method changes away from Add Custom, clear custom text
-         if (value !== "Add Custom") {
-           updateAssessmentMeta(pane.index, {
-             SeverityscoreParameter: value,
-             SeverityScoreCustomParameter: undefined
-           });
-         } else {
-           updateAssessmentMeta(pane.index, {
-             SeverityscoreParameter: value
-           });
-         }
-       }}
->
-<option value=""></option>
-       {SEVERITY_SCORE_PARAMETER.map(opt => (
-<option key={opt} value={opt}>
-           {opt}
-</option>
-       ))}
-</select>
-</div>
-   {/* 2. Custom method text, only when "Add Custom" selected */}
-   {am.SeverityscoreParameter === "Add Custom" && (
-<div className="dm-pane-field">
-<label>Add Custom</label>
-<input
-         type="text"
-         className="dm-input"
-         placeholder="Enter Custom Parameter"
-         value={am.SeverityScoreCustomParameter ?? ""}
-         onChange={e =>
-           updateAssessmentMeta(pane.index, { SeverityScoreCustomParameter: e.target.value })
-         }
-       />
-</div>
-   )}
-</>
-)}
-
 <div className="dm-pane-footer">
 <button type="button" onClick={() => setPane(null)}>
                Save & Close
@@ -1741,9 +663,316 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 </div>
      );
    }
+   // -------------------- Row pane --------------------
+   if (pane.mode === "row") {
+     const am = assessmentMeta[pane.index] || { Metadata_Bioslit: [] };
+     const showEye = hasEyeDropdown(am.AssessmentName);
+     const isVA = isVisualAcuityAssessment(am.AssessmentName);
+     const isBioslit = isBioslitAssessment(am.AssessmentName);
+     const isCustomMode = customModeRowIndex === pane.index;
+     return (
+<div className="dm-pane">
+<div className="dm-pane-content">
+<div className="dm-pane-header">
+             {/* ✅ requirement #2 */}
+<h3>Assessment Details</h3>
+<button type="button" className="dm-pane-close" onClick={() => setPane(null)}>
+               ×
+</button>
+</div>
+           {/* ✅ requirement #3: custom entry mode */}
+           {isCustomMode ? (
+<div className="dm-pane-field">
+<label>Custom Assessment</label>
+<input
+                 className="dm-input"
+                 value={customAssessmentText}
+                 onChange={e => setCustomAssessmentText(e.target.value)}
+                 placeholder="Type any custom assessment name..."
+               />
+<div className="dm-help-text">
+                 This will replace the row header with your custom text.
+</div>
+</div>
+           ) : (
+<>
+               {/* ✅ requirement #4: searchable assessment selector */}
+<div className="dm-pane-field">
+<label>Assessment Name</label>
+<div className="dm-search-select">
+<input
+                     className="dm-input"
+                     value={assessmentDropdownOpen ? assessmentSearch : (am.AssessmentName ?? "")}
+                     placeholder="Type to search..."
+                     onFocus={() => {
+                       setAssessmentDropdownOpen(true);
+                       setAssessmentSearch(am.AssessmentName ?? "");
+                     }}
+                     onChange={e => {
+                       setAssessmentDropdownOpen(true);
+                       setAssessmentSearch(e.target.value);
+                     }}
+                   />
+                   {assessmentDropdownOpen && (
+<div className="dm-search-select-menu">
+<div
+                         className="dm-search-select-item dm-clear"
+                         onClick={() => {
+                           updateAssessmentMeta(pane.index, { AssessmentName: "" });
+                           setAssessmentSearch("");
+                           setAssessmentDropdownOpen(false);
+                         }}
+>
+                         (Clear)
+</div>
+                       {filteredAssessmentOptions.slice(0, 200).map(name => (
+<div
+                           key={name}
+                           className="dm-search-select-item"
+                           onClick={() => {
+                             updateAssessmentMeta(pane.index, { AssessmentName: name });
+                             setAssessmentSearch(name);
+                             setAssessmentDropdownOpen(false);
+                           }}
+>
+                           {name}
+</div>
+                       ))}
+                       {filteredAssessmentOptions.length === 0 && (
+<div className="dm-search-select-item dm-empty">
+                           No matches
+</div>
+                       )}
+</div>
+                   )}
+</div>
+</div>
+               {/* Eye dropdown */}
+               {showEye && (
+<div className="dm-pane-field">
+<label>Eye</label>
+<select
+                     value={am.Eye ?? ""}
+                     onChange={e => updateAssessmentMeta(pane.index, { Eye: e.target.value })}
+>
+<option value=""></option>
+                     {EYE_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                         {opt}
+</option>
+                     ))}
+</select>
+</div>
+               )}
+               {/* VA dropdowns */}
+               {isVA && (
+<>
+<div className="dm-pane-field">
+<label>Correction</label>
+<select
+                       value={am.Correction ?? ""}
+                       onChange={e => updateAssessmentMeta(pane.index, { Correction: e.target.value })}
+>
+<option value=""></option>
+                       {CORRECTION_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                           {opt}
+</option>
+                       ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Notation</label>
+<select
+                       value={am.Notation ?? ""}
+                       onChange={e => updateAssessmentMeta(pane.index, { Notation: e.target.value })}
+>
+<option value=""></option>
+                       {NOTATION_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                           {opt}
+</option>
+                       ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Distance</label>
+<select
+                       value={am.Distance ?? ""}
+                       onChange={e => updateAssessmentMeta(pane.index, { Distance: e.target.value })}
+>
+<option value=""></option>
+                       {DISTANCE_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                           {opt}
+</option>
+                       ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Lighting</label>
+<select
+                       value={am.Lighting ?? ""}
+                       onChange={e => updateAssessmentMeta(pane.index, { Lighting: e.target.value })}
+>
+<option value=""></option>
+                       {LIGHTING_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                           {opt}
+</option>
+                       ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Contrast</label>
+<select
+                       value={am.Contrast ?? ""}
+                       onChange={e => updateAssessmentMeta(pane.index, { Contrast: e.target.value })}
+>
+<option value=""></option>
+                       {CONTRAST_OPTIONS.map(opt => (
+<option key={opt} value={opt}>
+                           {opt}
+</option>
+                       ))}
+</select>
+</div>
+</>
+               )}
+               {/* Bioslit */}
+               {isBioslit && (
+<>
+<div className="dm-pane-field">
+<label>Specify</label>
+<select
+                       value={am.Specify_Bioslit ?? ""}
+                       onChange={e => updateAssessmentMeta(pane.index, { Specify_Bioslit: e.target.value })}
+>
+<option value=""></option>
+                       {BIOSLIT_SPECIFY.map(opt => (
+<option key={opt} value={opt}>
+                           {opt}
+</option>
+                       ))}
+</select>
+</div>
+<div className="dm-pane-field">
+<label>Metadata</label>
+<div className="dm-multi-dropdown">
+<div
+                         className="dm-multi-dropdown-control"
+                         onClick={() =>
+                           setOpenBioSlitMenuIndex(openBioSlitMenuIndex === pane.index ? null : pane.index)
+                         }
+>
+                         {am.Metadata_Bioslit && am.Metadata_Bioslit.length > 0 && (
+<div className="dm-tags-row">
+                             {am.Metadata_Bioslit.map(tag => (
+<span
+                                 key={tag}
+                                 className="dm-tag"
+                                 onClick={e => {
+                                   e.stopPropagation();
+                                   const current = am.Metadata_Bioslit || [];
+                                   const next = current.filter(x => x !== tag);
+                                   updateAssessmentMeta(pane.index, { Metadata_Bioslit: next });
+                                 }}
+>
+                                 {tag}
+<span className="dm-tag-x">×</span>
+</span>
+                             ))}
+</div>
+                         )}
+<div className="dm-select-row">
+<span className="dm-select-text">Select</span>
+</div>
+<span className="dm-caret">▾</span>
+</div>
+                       {openBioSlitMenuIndex === pane.index && (
+<div className="dm-multi-dropdown-menu">
+                           {BIOSLIT_METADATA_MULTISELECT.map(opt => {
+                             const selected = (am.Metadata_Bioslit || []).includes(opt);
+                             return (
+<div
+                                 key={opt}
+                                 className={"dm-multi-dropdown-item" + (selected ? " dm-selected" : "")}
+                                 onClick={e => {
+                                   e.stopPropagation();
+                                   const current = am.Metadata_Bioslit || [];
+                                   const exists = current.includes(opt);
+                                   const next = exists ? current.filter(x => x !== opt) : [...current, opt];
+                                   updateAssessmentMeta(pane.index, { Metadata_Bioslit: next });
+                                 }}
+>
+                                 {opt}
+</div>
+                             );
+                           })}
+</div>
+                       )}
+</div>
+</div>
+</>
+               )}
+</>
+           )}
+           {/* Footer buttons */}
+<div className="dm-pane-footer dm-pane-footer-split">
+<button
+               type="button"
+               className="dm-secondary"
+               onClick={() => {
+                 // ✅ toggle custom assessment mode
+                 if (customModeRowIndex === pane.index) {
+                   // turning off custom mode
+                   setCustomModeRowIndex(null);
+                   setCustomAssessmentText("");
+                 } else {
+                   setCustomModeRowIndex(pane.index);
+                   setAssessmentDropdownOpen(false);
+                   setOpenBioSlitMenuIndex(null);
+                   // preload current row header if user already had something
+                   const currentHeader = rows[pane.index]?.RowHeader ?? "";
+                   setCustomAssessmentText(currentHeader);
+                 }
+               }}
+>
+               Enter Custom Assessment
+</button>
+<button
+               type="button"
+               onClick={() => {
+                 // ✅ If in custom mode, save custom value into meta + row header
+                 if (customModeRowIndex === pane.index) {
+                   updateAssessmentMeta(pane.index, {
+                     IsCustom: true,
+                     CustomAssessment: customAssessmentText
+                   });
+                   setCustomModeRowIndex(null);
+                   setCustomAssessmentText("");
+                 }
+                 setPane(null);
+                 setAssessmentDropdownOpen(false);
+               }}
+>
+               Save & Close
+</button>
+</div>
+</div>
+</div>
+     );
+   }
    return null;
  };
- // ---------- MAIN RENDER ----------
+ // Close search dropdown when clicking outside
+ React.useEffect(() => {
+   const onDocClick = () => setAssessmentDropdownOpen(false);
+   if (!assessmentDropdownOpen) return;
+   document.addEventListener("click", onDocClick);
+   return () => document.removeEventListener("click", onDocClick);
+ }, [assessmentDropdownOpen]);
+ // -------------------- Main render --------------------
  return (
 <div className="dm-container">
 <div className="dm-toolbar">
@@ -1758,93 +987,84 @@ const updateAssessmentMeta = (index: number, patch: Partial<AssessmentMeta>) => 
 <table className="dm-table" cellPadding={4} cellSpacing={0}>
 <thead>
 <tr>
-<th style={{ minWidth: 180 }}>Procedure/Assessment</th>
+<th style={{ minWidth: 180 }}>Row Header</th>
              {columns.map((c, i) => (
-<th key={i}>
+<th key={i} className={selectedColIndex === i ? "dm-col-selected" : ""}>
 <div className="dm-col-header-wrapper">
-<button
-       type="button"
-       className="dm-col-header-display dm-clickable"
-       onClick={() => setPane({ mode: "column", index: i })}
->
-       {c}
-</button>
+<input
+                     value={c}
+                     readOnly
+                     onClick={() => {
+                       setPane({ mode: "column", index: i });
+                       setCustomModeRowIndex(null);
+                     }}
+                     className={
+                       "dm-input dm-col-header dm-clickable" +
+                       (selectedColIndex === i ? " dm-selected-cell" : "")
+                     }
+                   />
 <div className="dm-header-buttons">
-<button
-         type="button"
-         className="dm-small"
-         onClick={() => moveColumn(i, i - 1)}
-         title="Move left"
->
-         ←
+<button type="button" className="dm-small" onClick={() => moveColumn(i, i - 1)} title="Move left">
+                       ←
 </button>
-<button
-         type="button"
-         className="dm-small"
-         onClick={() => moveColumn(i, i + 1)}
-         title="Move right"
->
-         →
+<button type="button" className="dm-small" onClick={() => moveColumn(i, i + 1)} title="Move right">
+                       →
 </button>
-<button
-         type="button"
-         className="dm-danger dm-small"
-         onClick={() => removeColumn(i)}
-         title="Delete column"
->
-         ×
+<button type="button" className="dm-danger dm-small" onClick={() => removeColumn(i)} title="Delete column">
+                       ×
 </button>
 </div>
 </div>
 </th>
-))}
+             ))}
 </tr>
 </thead>
 <tbody>
            {rows.map((r, ri) => (
-<tr key={ri}>
-<td>
+<tr key={ri} className={selectedRowIndex === ri ? "dm-row-selected" : ""}>
+<td className={selectedRowIndex === ri ? "dm-selected-cell" : ""}>
 <div className="dm-row-head">
 <div
-     className="dm-row-header-display dm-clickable"
-     onClick={() => setPane({ mode: "row", index: ri })}
+                     className={
+                       "dm-row-header-display dm-clickable" + (selectedRowIndex === ri ? " dm-selected-cell" : "")
+                     }
+                     onClick={() => {
+                       setPane({ mode: "row", index: ri });
+                       setAssessmentDropdownOpen(false);
+                       setAssessmentSearch("");
+                       setOpenBioSlitMenuIndex(null);
+                     }}
 >
-     {r.RowHeader}
+                     {r.RowHeader}
 </div>
 <div className="dm-header-buttons">
-<button
-       type="button"
-       className="dm-small"
-       onClick={() => moveRow(ri, ri - 1)}
-       title="Move up"
->
-       ↑
+<button type="button" className="dm-small" onClick={() => moveRow(ri, ri - 1)} title="Move up">
+                       ↑
 </button>
-<button
-       type="button"
-       className="dm-small"
-       onClick={() => moveRow(ri, ri + 1)}
-       title="Move down"
->
-       ↓
+<button type="button" className="dm-small" onClick={() => moveRow(ri, ri + 1)} title="Move down">
+                       ↓
 </button>
-<button
-       type="button"
-       className="dm-danger dm-small"
-       onClick={() => removeRow(ri)}
-       title="Delete row"
->
-       ×
+<button type="button" className="dm-danger dm-small" onClick={() => removeRow(ri)} title="Delete row">
+                       ×
 </button>
 </div>
 </div>
 </td>
                {columns.map((_, ci) => (
-<td key={ci}>
+<td
+                   key={ci}
+                   className={
+                     (selectedRowIndex === ri ? "dm-row-selected" : "") +
+                     (selectedColIndex === ci ? " dm-col-selected" : "")
+                   }
+>
 <input
                      value={r.Cells[ci] ?? ""}
                      onChange={e => setCell(ri, ci, e.target.value)}
-                     className="dm-input dm-cell"
+                     className={
+                       "dm-input dm-cell" +
+                       (selectedRowIndex === ri || selectedColIndex === ci ? " dm-selected-cell" : "")
+                     }
                    />
 </td>
                ))}
