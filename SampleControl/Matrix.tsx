@@ -1019,7 +1019,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
         <div className="dm-pane">
           <div className="dm-pane-content">
             <div className="dm-pane-header">
-              <h3>Build Visit (Column {pane.index + 1})</h3>
+              <h3>Visit Details</h3>
               <button
                 type="button"
                 className="dm-pane-close"
