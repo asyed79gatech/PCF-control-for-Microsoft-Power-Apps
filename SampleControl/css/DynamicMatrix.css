@@ -1,6 +1,10 @@
 .dm-container {
  font-family: Segoe UI, Arial, sans-serif;
- position: relative; /* so the pane can overlay inside */
+ position: relative;          /* pane overlay */
+ width: 100%;
+ height: 100%;                /* fill the control height given by Power Apps */
+ display: flex;
+ flex-direction: column;
 }
 .dm-toolbar {
  margin-bottom: 8px;
@@ -8,7 +12,8 @@
  gap: 8px;
 }
 .dm-table-wrapper {
- overflow: auto;
+ flex: 1 1 auto;              /* take remaining vertical space */
+ overflow: auto;              /* scroll when content exceeds */
  border: 1px solid #ddd;
 }
 .dm-table {
@@ -38,7 +43,7 @@
 .dm-danger {
  margin-left: 6px;
  background: #e81123;
- color: #fff;
+ color: #d60f0f;
  border: 0;
  padding: 2px 6px;
  cursor: pointer;
@@ -141,79 +146,187 @@
  box-sizing: border-box;
 }
 
+.dm-clickable {
+ cursor: pointer;
+}
 
-.dm-multi-dropdown {
- position: relative;
+.dm-row-head {
+ display: flex;
+ align-items: flex-start;
+}
+
+.dm-multiselect {
+ display: block;              /* simple block container */
+ max-height: 150px;
+ overflow-y: auto;
+ padding: 4px;
+ border: 1px solid #ccc;
+ background: #fff;
+ text-align: left;            /* force left alignment of contents */
+}
+.dm-multiselect-item {
+ display: flex;
+ align-items: center;
+ justify-content: flex-start; /* checkbox + text start at left */
+ gap: 4px;
+ font-size: 12px;
  width: 100%;
 }
-.dm-multi-dropdown-control {
+
+.dm-small.dm-danger {
+    background: #ffffff;
+    color: #e81123;
+    border: 1px solid #e81123
+}
+
+
+
+/* Multi-select dropdown shell */
+.dm-multi-dropdown {
+ position: relative;
+ border: 1px solid #ccc;
+ border-radius: 2px;
+ padding: 4px 24px 4px 6px;
+ background: #fff;
+ font-size: 12px;
+ cursor: pointer;
  display: flex;
- flex-direction: column;
- min-height: 40px;
- padding: 4px 28px 4px 8px;
+ align-items: center;
+ justify-content: space-between;
+ min-height: 24px;
+ box-sizing: border-box;
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
+}
+.dm-multi-placeholder {
+ color: #888;
+}
+/* little caret on the right */
+.dm-multi-caret {
+ margin-left: 8px;
+ font-size: 10px;
+}
+/* dropdown menu */
+.dm-multi-dropdown-menu {
+ position: relative;
+ margin-top: 4px;
  border: 1px solid #ccc;
  background: #fff;
- box-sizing: border-box;
- cursor: pointer;
- gap: 4px;
+ max-height: 160px;
+ overflow-y: auto;
+ box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+ z-index: 20;
 }
-/* row that holds the chips */
-.dm-tags-row {
- display: flex;
- flex-wrap: wrap;
- gap: 4px;
-}
-/* row that looks like the “Select” input line */
-.dm-select-row {
- border-top: 1px dotted #999;   /* that dashed line you see */
- margin-top: 2px;
- padding-top: 2px;
-}
-.dm-select-text {
- font-size: 12px;
- color: #666;
-}
-.dm-caret {
- position: absolute;
- right: 8px;
- top: 50%;
- transform: translateY(-50%);
- font-size: 10px;
- pointer-events: none;
-}
-.dm-tag {
- display: inline-flex;
+/* each option row */
+.dm-multi-dropdown-option {
+ display: flex !important;
  align-items: center;
- padding: 2px 6px;
- border-radius: 12px;
- background: #e5f1fb;
- font-size: 11px;
+ justify-content: flex-start;
+ gap: 6px;
+ padding: 3px 6px;
+ font-size: 12px;
+ cursor: pointer;
+ text-align: left !important;
 }
-.dm-tag-x {
- margin-left: 4px;
- font-weight: bold;
+.dm-multi-dropdown-option input {
+ margin: 0;
 }
-.dm-multi-dropdown-menu {
+.dm-multi-dropdown-option--selected {
+ background: #f3f2f1;
+}
+
+.dm-multi-select {
+ width: 100%;
+ min-height: 80px;
+ box-sizing: border-box;
+}
+.dm-multi-select-hint {
+ font-size: 10px;
+ color: #605e5c;
+}
+
+/* for Timepoint / Window inline selects */
+.dm-inline-group {
+ display: flex;
+ gap: 4px;
+}
+.dm-inline-group select {
+ flex: 1 1 0;
+}
+/* Simple toggle for Exit? */
+.dm-toggle {
+ position: relative;
+ display: inline-block;
+ width: 36px;
+ height: 20px;
+}
+.dm-toggle input {
+ opacity: 0;
+ width: 0;
+ height: 0;
+}
+.dm-toggle-slider {
  position: absolute;
+ cursor: pointer;
+ top: 0;
  left: 0;
  right: 0;
- margin-top: 2px;
- max-height: 180px;
- overflow-y: auto;
- border: 1px solid #ccc;
+ bottom: 0;
+ background-color: #ccc;
+ transition: 0.2s;
+ border-radius: 34px;
+}
+.dm-toggle-slider:before {
+ position: absolute;
+ content: "";
+ height: 14px;
+ width: 14px;
+ left: 3px;
+ top: 3px;
+ background-color: white;
+ transition: 0.2s;
+ border-radius: 50%;
+}
+.dm-toggle input:checked + .dm-toggle-slider {
+ background-color: #0078d4;
+}
+.dm-toggle input:checked + .dm-toggle-slider:before {
+ transform: translateX(16px);
+}
+
+
+.dm-col-header-display {
+ display: block;
+ width: 100%;
+ text-align: left;
+ white-space: pre-wrap;      /* respect \n */
+ word-break: break-word;
+ padding: 4px;
+ min-height: 32px;
  background: #fff;
- z-index: 50;
- box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+ border: 1px solid #ccc;
+ box-sizing: border-box;
+ min-width: 140px;
+ /* reset default button styling */
+ border-radius: 0;
+ outline: none;
 }
-.dm-multi-dropdown-item {
- padding: 6px 8px;
- font-size: 12px;
- cursor: pointer;
+/* optional: make header cells align from the top */
+.dm-table th,
+.dm-table td {
+ border: 1px solid #ccc;
+ vertical-align: top;
 }
-.dm-multi-dropdown-item:hover {
- background: #f3f3f3;
+
+/* remove native button chrome */
+.dm-col-header-display.dm-clickable {
+ background-color: #fff;
+ border-color: #ccc;
 }
-.dm-multi-dropdown-item.dm-selected {
- background: #e5f1fb;
- font-weight: 600;
+.dm-col-header-display.dm-clickable:focus {
+ outline: 1px solid #0078d4;   /* optional focus ring */
+}
+.dm-col-header-display.dm-clickable:hover {
+ background-color: #f3f2f1;
 }
