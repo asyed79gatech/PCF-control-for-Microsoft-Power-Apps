@@ -410,7 +410,8 @@ const VISUAL_ACUITY_ASSESSMENTS: string[] = [
   "Uncorrected Distance Visual Acuity (UCDVA)",
   "Uncorrected Intermediate Visual Acuity (UCIVA)",
   "Uncorrected Near Visual Acuity (UCNVA)",
-  "Uncorrected Visual Acuity (UCVA)"
+  "Uncorrected Visual Acuity (UCVA)",
+  "Visual Acuity"
 ];
 
 const CORRECTION_OPTIONS: string[] = [
