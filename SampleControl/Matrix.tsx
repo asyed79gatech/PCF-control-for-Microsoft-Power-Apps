@@ -44,6 +44,7 @@ type AssessmentMeta = {
   SurgicalReportAllThatApply?: string[];
   SeverityscoreParameter?: string;
   SeverityScoreCustomParameter?: string;
+  OCTSegmentOptions?: string
 };
 
 type TablePayload = {
@@ -597,6 +598,9 @@ const SURGICAL_REPORT_ALL_THAT_APPLY: string[] = [
 const SEVERITY_SCORE_ASSESSMENTS: string[] = ["Severity Score"];
 const SEVERITY_SCORE_PARAMETER: string[] = ["Halo", "Starbursts", "Glare", "Add Custom"];
 
+const OCT_ASSESSMENTS: string[] = ["Optical Coherence Tomography (OCT)"];
+const OCT_SEGMENT_OPTIONS: string[] = ["Posterior, Anterior"]
+
 const VISIT_NAME_OPTIONS: string[] = [
   "Baseline",
   "Baseline/Dispense",
@@ -642,7 +646,9 @@ const hasEyeDropdown = (name?: string): boolean =>
     CS_ASSESSMNETS.includes(name) ||
     CATARACT_ASSESSMENTS.includes(name) ||
     VF_ASSESSMENTS.includes(name) ||
-    SURGICAL_REPORT_ASSESSMENTS.includes(name));
+    SURGICAL_REPORT_ASSESSMENTS.includes(name) ||
+    OCT_ASSESSMENTS.includes(name)
+  );
 
 const isVisualAcuityAssessment = (name?: string): boolean => !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
 const isBioSlitAssessment = (name?: string): boolean => !!name && BIO_SLIT_ASSESSMENTS.includes(name);
@@ -657,6 +663,8 @@ const isCataractAssessment = (name?: string): boolean => !!name && CATARACT_ASSE
 const isVFAssessment = (name?: string): boolean => !!name && VF_ASSESSMENTS.includes(name);
 const isSurgicalReportAssessment = (name?: string): boolean => !!name && SURGICAL_REPORT_ASSESSMENTS.includes(name);
 const isSeverityScoreAssessment = (name?: string): boolean => !!name && SEVERITY_SCORE_ASSESSMENTS.includes(name);
+const isOCTAssessment = (name?: string): boolean => !!name && OCT_ASSESSMENTS.includes(name);
+
 
 // ---------- Header formatters ----------
 const formatAssessmentHeader = (meta: AssessmentMeta): string => {
@@ -689,6 +697,7 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
 
   if (meta.LensFitSubCat) parts.push(meta.LensFitSubCat);
   if (meta.LensFitAllThatApply && meta.LensFitAllThatApply.length) parts.push(meta.LensFitAllThatApply.join(", "));
+  if (meta.OCTSegmentOptions) parts.push(meta.OCTSegmentOptions);
 
   return parts.length === 0 ? meta.AssessmentName : `${meta.AssessmentName} ${parts.join(", ")}`;
 };
@@ -746,7 +755,8 @@ const makeBlankAssessmentMeta = (name?: string): AssessmentMeta => ({
   VFMethod: undefined,
   SurgicalReportAllThatApply: [],
   SeverityScoreCustomParameter: undefined,
-  SeverityscoreParameter: undefined
+  SeverityscoreParameter: undefined,
+  OCTSegmentOptions: undefined
 });
 
 const makeSeededDefaultTable = (): TablePayload => {
@@ -1187,19 +1197,19 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
       const isVF = isVFAssessment(am.AssessmentName);
       const isSurgicalReport = isSurgicalReportAssessment(am.AssessmentName);
       const isSeverityScore = isSeverityScoreAssessment(am.AssessmentName);
+      const isOCT = isOCTAssessment(am.AssessmentName)
 
       return (
         <div className="dm-pane">
           <div className="dm-pane-content">
             <div className="dm-pane-header">
-              {/* Enhancement #2 */}
               <h3>Assessment Details</h3>
               <button type="button" className="dm-pane-close" onClick={() => setPane(null)}>
                 ×
               </button>
             </div>
 
-            {/* Enhancement #3 - Custom Assessment mode */}
+            {/*Custom Assessment mode */}
             {customRowMode ? (
               <div className="dm-pane-field">
                 <label>Custom Assessment Name</label>
@@ -1216,7 +1226,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
               </div>
             ) : (
               <>
-                {/* Enhancement #4 - Searchable Assessment Name */}
+                {/* Searchable Assessment Name */}
                 <SearchableSelect
                   label="Assessment Name"
                   options={ASSESSMENT_OPTIONS}
@@ -1582,6 +1592,23 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                   </div>
                 )}
 
+                {isOCT && (
+                  <div className="dm-pane-field">
+                    <label>Segment</label>
+                    <select
+                      value={am.OCTSegmentOptions ?? ""}
+                      onChange={e => updateAssessmentMeta(pane.index, { OCTSegmentOptions: e.target.value })}
+                    >
+                      <option value=""></option>
+                      {OCT_SEGMENT_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 {isSurgicalReport && (
                   <MultiSelect
                     label="Select All that Apply"
@@ -1635,7 +1662,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
               </>
             )}
 
-            {/* Enhancement #3: add button next to Save & Close */}
+            {/* add button next to Save & Close */}
             <div className="dm-pane-footer dm-pane-footer--split">
               <button
                 type="button"
