@@ -336,6 +336,8 @@ const ASSESSMENTS_WITH_EYE: string[] = [
   "Axial Length",
   "Axis Orientation",
   "Biometry",
+  "Biomicrscopy",
+  "Slit Lampt Examination",
   "Nd:YAG capsulotomy",
   "Cataract Grading",
   "Conjunctival Staining",
@@ -459,7 +461,7 @@ const BIO_SLIT_SPECIFY_OPTIONS: string[] = [
   "(Posterior capsulotomy evaluation)"
 ];
 const BIO_SLIT_METADATA_OPTIONS: string[] = [
-  "Anterior capsule phimosis",
+  "Anterior Capsule Phimosis",
   "Anterior Chamber Cells",
   "Anterior Chamber Flare",
   "Anterior Chamber Synechiae",
