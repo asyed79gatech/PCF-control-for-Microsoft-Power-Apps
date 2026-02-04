@@ -599,7 +599,7 @@ const SEVERITY_SCORE_ASSESSMENTS: string[] = ["Severity Score"];
 const SEVERITY_SCORE_PARAMETER: string[] = ["Halo", "Starbursts", "Glare", "Add Custom"];
 
 const OCT_ASSESSMENTS: string[] = ["Optical Coherence Tomography (OCT)"];
-const OCT_SEGMENT_OPTIONS: string[] = ["Posterior, Anterior"]
+const OCT_SEGMENT_OPTIONS: string[] = ["Posterior", "Anterior"]
 
 const VISIT_NAME_OPTIONS: string[] = [
   "Baseline",
