@@ -494,7 +494,7 @@ const BIO_SLIT_METADATA_OPTIONS: string[] = [
 ];
 
 const HABITUAL_ASSESSMENTS: string[] = ["Habitual Lens Usage"];
-const HABITUAL_METADATA: string[] = ["brand", "lens care brand", "manufacturer", "modality", "power", "wear success"];
+const HABITUAL_METADATA: string[] = ["Brand", "Lens Care Brand", "Manufacturer", "Modality", "Power", "Wear Success"];
 
 const REFRACTION_ASSESSMENTS: string[] = ["Manifest Refraction (MRSE)", "Cycloplegic Refraction", "Objective Refraction"];
 const REFRACTION_ALL_THAT_APPLY: string[] = [
