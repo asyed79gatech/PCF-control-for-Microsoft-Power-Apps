@@ -22,7 +22,7 @@ type AssessmentMeta = {
   Distance?: string;
   Lighting?: string;
   Contrast?: string;
-  BioSlitSpecify?: string;
+  BioSlitSpecify?: string[];
   BioSlitMetadata?: string[];
   HabitualMetadata?: string[];
   RefractionAllThatApply?: string[];
@@ -457,8 +457,8 @@ const BIO_SLIT_SPECIFY_OPTIONS: string[] = [
   "(Lens Opacification)",
   "(Retroillumination)",
   "(Targeted)",
-  "(Posterior capsule opacification)",
-  "(Posterior capsulotomy evaluation)"
+  "(Posterior Capsule Opacification)",
+  "(Posterior Capsulotomy Evaluation)"
 ];
 const BIO_SLIT_METADATA_OPTIONS: string[] = [
   "Anterior Capsule Phimosis",
@@ -680,7 +680,7 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
   if (meta.SubjectiveRatingsSubCat) parts.push(meta.SubjectiveRatingsSubCat);
   if (meta.SubjectiveRatingsAllThatApply && meta.SubjectiveRatingsAllThatApply.length) parts.push(meta.SubjectiveRatingsAllThatApply.join(", "));
   if (meta.Eye) parts.push(meta.Eye);
-  if (meta.BioSlitSpecify) parts.push(meta.BioSlitSpecify);
+  if (meta.BioSlitSpecify && meta.BioSlitSpecify.length) parts.push(meta.BioSlitSpecify.join(", "));
   if (meta.RefractionAllThatApply && meta.RefractionAllThatApply.length) parts.push(meta.RefractionAllThatApply.join(", "));
   if (meta.ROVMethod && meta.ROVMethod.length) parts.push(meta.ROVMethod.join(", "));
   if (meta.ROVRange) parts.push(meta.ROVRange);
@@ -738,7 +738,7 @@ const makeBlankAssessmentMeta = (name?: string): AssessmentMeta => ({
   Distance: undefined,
   Lighting: undefined,
   Contrast: undefined,
-  BioSlitSpecify: undefined,
+  BioSlitSpecify: [],
   BioSlitMetadata: [],
   HabitualMetadata: [],
   RefractionAllThatApply: [],
@@ -1351,20 +1351,12 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
 
                 {isBioSlit && (
                   <>
-                    <div className="dm-pane-field">
-                      <label>Specify</label>
-                      <select
-                        value={am.BioSlitSpecify ?? ""}
-                        onChange={e => updateAssessmentMeta(pane.index, { BioSlitSpecify: e.target.value })}
-                      >
-                        <option value=""></option>
-                        {BIO_SLIT_SPECIFY_OPTIONS.map(opt => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <MultiSelect
+                      label="Specify"
+                      options={BIO_SLIT_SPECIFY_OPTIONS}
+                      selected={am.BioSlitSpecify}
+                      onChange={next => updateAssessmentMeta(pane.index, { BioSlitSpecify: next })}
+                    />
 
                     <MultiSelect
                       label="Metadata"
