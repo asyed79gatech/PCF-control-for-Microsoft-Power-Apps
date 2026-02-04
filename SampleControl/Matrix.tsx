@@ -44,7 +44,8 @@ type AssessmentMeta = {
   SurgicalReportAllThatApply?: string[];
   SeverityscoreParameter?: string;
   SeverityScoreCustomParameter?: string;
-  OCTSegmentOptions?: string
+  OCTSegmentOptions?: string;
+  AxisTimepointCustom?: string
 };
 
 type TablePayload = {
@@ -626,6 +627,8 @@ const VISIT_NAME_OPTIONS: string[] = [
   "Unscheduled Visit"
 ];
 
+const AXIS_OR_ASSESSMENTS: string[] = ["Axis Orientation"]
+
 const LENS_OPTIONS: string[] = ["Lens 1", "Lens 2", "Lens 3", "Lens 4", "Lens 5", "N/A"];
 const TIMEPOINT_UNIT_OPTIONS: string[] = ["Hour", "Day", "Week", "Month"];
 
@@ -649,7 +652,8 @@ const hasEyeDropdown = (name?: string): boolean =>
     CATARACT_ASSESSMENTS.includes(name) ||
     VF_ASSESSMENTS.includes(name) ||
     SURGICAL_REPORT_ASSESSMENTS.includes(name) ||
-    OCT_ASSESSMENTS.includes(name)
+    OCT_ASSESSMENTS.includes(name) ||
+    AXIS_OR_ASSESSMENTS.includes(name)
   );
 
 const isVisualAcuityAssessment = (name?: string): boolean => !!name && VISUAL_ACUITY_ASSESSMENTS.includes(name);
@@ -666,6 +670,7 @@ const isVFAssessment = (name?: string): boolean => !!name && VF_ASSESSMENTS.incl
 const isSurgicalReportAssessment = (name?: string): boolean => !!name && SURGICAL_REPORT_ASSESSMENTS.includes(name);
 const isSeverityScoreAssessment = (name?: string): boolean => !!name && SEVERITY_SCORE_ASSESSMENTS.includes(name);
 const isOCTAssessment = (name?: string): boolean => !!name && OCT_ASSESSMENTS.includes(name);
+const isAxisORAssessment = (name?: string): boolean => !!name && AXIS_OR_ASSESSMENTS.includes(name)
 
 
 // ---------- Header formatters ----------
@@ -700,6 +705,7 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
   if (meta.LensFitSubCat) parts.push(meta.LensFitSubCat);
   if (meta.LensFitAllThatApply && meta.LensFitAllThatApply.length) parts.push(meta.LensFitAllThatApply.join(", "));
   if (meta.OCTSegmentOptions) parts.push(meta.OCTSegmentOptions);
+  if(meta.AxisTimepointCustom) parts.push(meta.AxisTimepointCustom)
 
   return parts.length === 0 ? meta.AssessmentName : `${meta.AssessmentName} ${parts.join(", ")}`;
 };
@@ -758,7 +764,8 @@ const makeBlankAssessmentMeta = (name?: string): AssessmentMeta => ({
   SurgicalReportAllThatApply: [],
   SeverityScoreCustomParameter: undefined,
   SeverityscoreParameter: undefined,
-  OCTSegmentOptions: undefined
+  OCTSegmentOptions: undefined,
+  AxisTimepointCustom: undefined
 });
 
 const makeSeededDefaultTable = (): TablePayload => {
@@ -1199,7 +1206,8 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
       const isVF = isVFAssessment(am.AssessmentName);
       const isSurgicalReport = isSurgicalReportAssessment(am.AssessmentName);
       const isSeverityScore = isSeverityScoreAssessment(am.AssessmentName);
-      const isOCT = isOCTAssessment(am.AssessmentName)
+      const isOCT = isOCTAssessment(am.AssessmentName);
+      const isAxisOR = isAxisORAssessment(am.AssessmentName)
 
       return (
         <div className="dm-pane">
@@ -1652,6 +1660,21 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                       </div>
                     )}
                   </>
+                )}
+
+                {isAxisOR && (
+                    <div className="dm-pane-field">
+                      <label>Timepoint</label>
+                      <input
+                        type ="text"
+                        className="dm-imput"
+                        placeholder="Enter Timepoint (Custom)"
+                        value = {am.AxisTimepointCustom ?? ""}
+                        onChange={e =>
+                          updateAssessmentMeta(pane.index, {AxisTimepointCustom: e.target.value})
+                        }
+                      />
+                    </div>
                 )}
               </>
             )}
