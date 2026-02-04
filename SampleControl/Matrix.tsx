@@ -1763,10 +1763,10 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
     <div className="dm-container">
       <div className="dm-toolbar">
         <button type="button" onClick={addRow}>
-          + Add Row
+          + Add Assessment
         </button>
         <button type="button" onClick={addColumn}>
-          + Add Column
+          + Add Visit
         </button>
       </div>
 
