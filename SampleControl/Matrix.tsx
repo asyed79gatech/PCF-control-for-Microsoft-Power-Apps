@@ -45,7 +45,8 @@ type AssessmentMeta = {
   SeverityscoreParameter?: string;
   SeverityScoreCustomParameter?: string;
   OCTSegmentOptions?: string;
-  AxisTimepointCustom?: string
+  AxisTimepointCustom?: string,
+  MedicalConcomitantCollectionDetails?: string
 };
 
 type TablePayload = {
@@ -227,6 +228,7 @@ const ASSESSMENT_OPTIONS: string[] = [
   "Continuous Wear Duration",
   "Contrast Sensitivity",
   "Corneal Topography",
+  "Concomitant Medications",
   "Cycloplegic Refraction",
   "Defocus Curve",
   "Demographics",
@@ -268,7 +270,7 @@ const ASSESSMENT_OPTIONS: string[] = [
   "Manifest Refraction (MRSE)",
   "McCarty Symptom Questionnaire",
   "McMonnies Questionnaire",
-  "Medical History and Concomitant Medications",
+  "Medical History",
   "Meibomian Gland Functionality Assessment",
   "Misallocation",
   "National Eye Institute Visual Function Questionnaire-25 (NEI-VFQ25)",
@@ -601,6 +603,9 @@ const SURGICAL_REPORT_ALL_THAT_APPLY: string[] = [
 const SEVERITY_SCORE_ASSESSMENTS: string[] = ["Severity Score"];
 const SEVERITY_SCORE_PARAMETER: string[] = ["Halo", "Starbursts", "Glare", "Add Custom"];
 
+const MEDICAL_CONCOMITANT_ASSESSMENTS: string[] = ["Medical History", "Concomitant Medications"]
+const MEDICAL_CONCOMITANT_COLLECTION_OPTIONS: string[] = ["Source Only", "Targeted CRF: All ocular and atargeted systemic", "Full data in source CRF"]
+
 const OCT_ASSESSMENTS: string[] = ["Optical Coherence Tomography (OCT)"];
 const OCT_SEGMENT_OPTIONS: string[] = ["Posterior", "Anterior"]
 
@@ -670,7 +675,8 @@ const isVFAssessment = (name?: string): boolean => !!name && VF_ASSESSMENTS.incl
 const isSurgicalReportAssessment = (name?: string): boolean => !!name && SURGICAL_REPORT_ASSESSMENTS.includes(name);
 const isSeverityScoreAssessment = (name?: string): boolean => !!name && SEVERITY_SCORE_ASSESSMENTS.includes(name);
 const isOCTAssessment = (name?: string): boolean => !!name && OCT_ASSESSMENTS.includes(name);
-const isAxisORAssessment = (name?: string): boolean => !!name && AXIS_OR_ASSESSMENTS.includes(name)
+const isAxisORAssessment = (name?: string): boolean => !!name && AXIS_OR_ASSESSMENTS.includes(name);
+const isMedicalConcomitantAssessment = (name?: string): boolean => !!name && MEDICAL_CONCOMITANT_ASSESSMENTS.includes(name)
 
 
 // ---------- Header formatters ----------
@@ -706,6 +712,7 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
   if (meta.LensFitAllThatApply && meta.LensFitAllThatApply.length) parts.push(meta.LensFitAllThatApply.join(", "));
   if (meta.OCTSegmentOptions) parts.push(meta.OCTSegmentOptions);
   if(meta.AxisTimepointCustom) parts.push(meta.AxisTimepointCustom)
+  if(meta.MedicalConcomitantCollectionDetails) parts.push(meta.MedicalConcomitantCollectionDetails)
 
   return parts.length === 0 ? meta.AssessmentName : `${meta.AssessmentName} ${parts.join(", ")}`;
 };
@@ -727,13 +734,14 @@ const formatVisitHeader = (meta: VisitMeta): string => {
 // ---------- DEFAULT TABLE & PARSING ----------
 const DEFAULT_COLUMNS = ["", ""];
 
-// Requirement #5 defaults (first time only)
+// Requirement #6 defaults (first time only)
 const DEFAULT_ASSESSMENT_SEED: string[] = [
   "Adverse Event(s)",
   "Demographics",
   "Inclusion / Exclusion Criteria",
   "Informed Consent",
-  "Medical History and Concomitant Medications"
+  "Medical History",
+  "Concomitant Medications"
 ];
 
 const makeBlankAssessmentMeta = (name?: string): AssessmentMeta => ({
@@ -765,7 +773,8 @@ const makeBlankAssessmentMeta = (name?: string): AssessmentMeta => ({
   SeverityScoreCustomParameter: undefined,
   SeverityscoreParameter: undefined,
   OCTSegmentOptions: undefined,
-  AxisTimepointCustom: undefined
+  AxisTimepointCustom: undefined,
+  MedicalConcomitantCollectionDetails: undefined
 });
 
 const makeSeededDefaultTable = (): TablePayload => {
@@ -1207,7 +1216,8 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
       const isSurgicalReport = isSurgicalReportAssessment(am.AssessmentName);
       const isSeverityScore = isSeverityScoreAssessment(am.AssessmentName);
       const isOCT = isOCTAssessment(am.AssessmentName);
-      const isAxisOR = isAxisORAssessment(am.AssessmentName)
+      const isAxisOR = isAxisORAssessment(am.AssessmentName);
+      const isMediCon = isMedicalConcomitantAssessment(am.AssessmentName)
 
       return (
         <div className="dm-pane">
@@ -1676,6 +1686,24 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                       />
                     </div>
                 )}
+
+                {isMediCon && (
+                  <div className="dm-pane-field">
+                    <label>Collection Details</label>
+                    <select
+                      value={am.MedicalConcomitantCollectionDetails ?? ""}
+                      onChange={e => updateAssessmentMeta(pane.index, { MedicalConcomitantCollectionDetails: e.target.value })}
+                    >
+                      <option value=""></option>
+                      {MEDICAL_CONCOMITANT_COLLECTION_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
               </>
             )}
 
