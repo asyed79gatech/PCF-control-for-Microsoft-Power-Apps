@@ -310,6 +310,7 @@ const ASSESSMENT_OPTIONS: string[] = [
   "Study Lens Power",
   "Subject Diary",
   "Subjective Likert Questionnaire (5-Point Scale)",
+  "Subjective Likert (10-point Scale)",
   "Subjective Ratings",
   "Subjective Ratings (1-10 Scale)",
   "Surgical Report",
@@ -515,6 +516,7 @@ const ROV_METHOD_OPTIONS: string[] = ["Pre-fogging", "Post-fogging", "(Negative 
 
 const SUBJECTIVE_RATINGS_ASSESSMENTS: string[] = [
   "Subjective Likert Questionnaire (5-Point Scale)",
+  "Subjective Likert (10-Point Scale",
   "Subjective Ratings",
   "Subjective Ratings (1-10 Scale)",
   "Visual Analog Scale (VAS)",
