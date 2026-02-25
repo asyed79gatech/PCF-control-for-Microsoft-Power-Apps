@@ -268,6 +268,7 @@ const ASSESSMENT_OPTIONS: string[] = [
   "Lens Rotational Recovery",
   "Lens Settling Time",
   "Lens Wear Time",
+  "Lens Surface Assessments (Wettability, Deposits)",
   "Lissamine Green Circumlimbal Conjunctival Staining",
   "Manifest Refraction (MRSE)",
   "McCarty Symptom Questionnaire",
