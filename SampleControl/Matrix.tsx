@@ -32,7 +32,7 @@ type AssessmentMeta = {
   SubjectiveRatingsSubCat?: string;
   SubjectiveRatingsAllThatApply?: string[];
   SPCMetadata?: string[];
-  LensFitSubCat?: string;
+  LensFitSubCat?: string[];
   LensFitAllThatApply?: string[];
   CSMethod?: string;
   CSMethodCustom?: string;
@@ -561,7 +561,7 @@ const SPC_METADATA_ALL_THAT_APPLY: string[] = [
 ];
 
 const LENS_FIT_ASSESSMENTS: string[] = ["Lens Fit Assessments"];
-const LENS_FIT_SUBCAT: string[] = ["Primary", "Peripheral"];
+const LENS_FIT_SUBCAT: string[] = ["Primary Gaze", "Peripheral Gazes"];
 const LENS_FIT_ALL_THAT_APPLY: string[] = ["Lens movement (overall fit)", "Lens position (centration)"];
 
 const CS_ASSESSMNETS: string[] = ["Contrast Sensitivity"];
@@ -708,7 +708,7 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
   if (meta.Lighting) parts.push(meta.Lighting);
   if (meta.Contrast) parts.push(meta.Contrast);
 
-  if (meta.LensFitSubCat) parts.push(meta.LensFitSubCat);
+  if (meta.LensFitSubCat && meta.LensFitSubCat.length) parts.push(meta.LensFitSubCat.join(", "));
   if (meta.LensFitAllThatApply && meta.LensFitAllThatApply.length) parts.push(meta.LensFitAllThatApply.join(", "));
   if (meta.OCTSegmentOptions) parts.push(meta.OCTSegmentOptions);
   if(meta.AxisTimepointCustom) parts.push(meta.AxisTimepointCustom)
@@ -1468,27 +1468,19 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
 
                 {isLensFit && (
                   <>
-                    <div className="dm-pane-field">
-                      <label>Sub Category</label>
-                      <select
-                        value={am.LensFitSubCat ?? ""}
-                        onChange={e => updateAssessmentMeta(pane.index, { LensFitSubCat: e.target.value })}
-                      >
-                        <option value=""></option>
-                        {LENS_FIT_SUBCAT.map(opt => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  <MultiSelect
+                    label="Gaze"
+                    options={LENS_FIT_SUBCAT}
+                    selected={am.LensFitSubCat || []}
+                    onChange={next => updateAssessmentMeta(pane.index, { LensFitSubCat: next })}
+                  />
 
-                    <MultiSelect
-                      label="Select all that apply"
-                      options={LENS_FIT_ALL_THAT_APPLY}
-                      selected={am.LensFitAllThatApply || []}
-                      onChange={next => updateAssessmentMeta(pane.index, { LensFitAllThatApply: next })}
-                    />
+                  <MultiSelect
+                    label="Select all that apply"
+                    options={LENS_FIT_ALL_THAT_APPLY}
+                    selected={am.LensFitAllThatApply || []}
+                    onChange={next => updateAssessmentMeta(pane.index, { LensFitAllThatApply: next })}
+                  />
                   </>
                 )}
 
