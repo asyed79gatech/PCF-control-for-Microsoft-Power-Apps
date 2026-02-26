@@ -606,7 +606,7 @@ const SEVERITY_SCORE_ASSESSMENTS: string[] = ["Severity Score"];
 const SEVERITY_SCORE_PARAMETER: string[] = ["Halo", "Starbursts", "Glare", "Add Custom"];
 
 const MEDICAL_CONCOMITANT_ASSESSMENTS: string[] = ["Medical History", "Concomitant Medications"]
-const MEDICAL_CONCOMITANT_COLLECTION_OPTIONS: string[] = ["Source Only", "Targeted CRF: All ocular and atargeted systemic", "Full data in source CRF"]
+const MEDICAL_CONCOMITANT_COLLECTION_OPTIONS: string[] = ["Source Only", "Targeted CRF: All ocular and targeted systemic", "Full data in source CRF"]
 
 const OCT_ASSESSMENTS: string[] = ["Optical Coherence Tomography (OCT)"];
 const OCT_SEGMENT_OPTIONS: string[] = ["Posterior", "Anterior"]
