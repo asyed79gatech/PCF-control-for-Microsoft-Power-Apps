@@ -11,6 +11,7 @@ type VisitMeta = {
   WindowSign?: string;
   WindowValue?: string;
   WindowUnit?: string;
+  CustomWindowText?: string;
   Exit?: boolean;
 };
 
@@ -728,7 +729,9 @@ const formatVisitHeader = (meta: VisitMeta): string => {
   if (meta.Lens) lines.push(`${meta.Lens}`);
   if (meta.TimepointUnit && meta.TimepointValue) lines.push(`${meta.TimepointUnit} ${meta.TimepointValue}`);
   if (meta.WindowSign && meta.WindowValue && meta.WindowUnit) lines.push(`${meta.WindowSign} ${meta.WindowValue} ${meta.WindowUnit}`);
-
+  if (meta.CustomWindowText && meta.CustomWindowText.trim()) {
+    lines.push(meta.CustomWindowText.trim());
+  }
   const exitSuffix = meta.Exit ? "/Exit" : "";
   lines.push(exitSuffix);
 
@@ -1176,6 +1179,20 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                     </option>
                   ))}
                 </select>
+                
+                <div className="dm-pane-field">
+                  <input
+                    type="text"
+                    className="dm-input"
+                    placeholder="Add Custom Window"
+                    value={vm.CustomWindowText ?? ""}
+                    onChange={e =>
+                      updateVisitMeta(pane.index, {
+                        CustomWindowText: e.target.value
+                      })
+                    }
+                  />
+                </div>
               </div>
             </div>
 
