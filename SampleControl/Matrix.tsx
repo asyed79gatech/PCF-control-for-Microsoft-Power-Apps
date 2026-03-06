@@ -1768,7 +1768,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
         <table className="dm-table" cellPadding={4} cellSpacing={0}>
           <thead>
             <tr>
-              <th style={{ minWidth: 180 }}>Row Header</th>
+              <th style={{ minWidth: 180 }}>Procedure/Assessment</th>
               {columns.map((c, i) => (
                 <th key={i} className={selectedColIndex === i ? "dm-th-selected" : ""}>
                   <div className="dm-col-header-wrapper">
