@@ -638,7 +638,7 @@ const VISIT_NAME_OPTIONS: string[] = [
 
 const AXIS_OR_ASSESSMENTS: string[] = ["Axis Orientation"]
 
-const LENS_OPTIONS: string[] = ["Lens 1", "Lens 2", "Lens 3", "Lens 4", "Lens 5", "N/A"];
+const LENS_OPTIONS: string[] = ["Lens 1", "Lens 2", "Lens 3", "Lens 4", "Lens 5", "1st Eye", "2nd Eye", "Both Eyes"];
 const TIMEPOINT_UNIT_OPTIONS: string[] = ["Hour", "Day", "Week", "Month"];
 
 const TIMEPOINT_VALUE_OPTIONS: string[] = [];
@@ -1098,7 +1098,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
             </div>
 
             <div className="dm-pane-field">
-              <label>Lens</label>
+              <label>Lens/Eye</label>
               <select
                 value={vm.Lens ?? ""}
                 onChange={e => updateVisitMeta(pane.index, { Lens: e.target.value })}
