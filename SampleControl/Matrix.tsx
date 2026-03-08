@@ -1179,22 +1179,22 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                     </option>
                   ))}
                 </select>
-                
-                <div className="dm-pane-field">
-                  <input
-                    type="text"
-                    className="dm-input"
-                    placeholder="Add Custom Window"
-                    value={vm.CustomWindowText ?? ""}
-                    onChange={e =>
-                      updateVisitMeta(pane.index, {
-                        CustomWindowText: e.target.value
-                      })
-                    }
-                  />
-                </div>
               </div>
+              
+                {/* ✅ custom window input now on its own line, under the dropdowns */}
+                <input
+                  type="text"
+                  className="dm-input"
+                  placeholder="Add Custom Window"
+                  value={vm.CustomWindowText ?? ""}
+                  onChange={e =>
+                    updateVisitMeta(pane.index, { CustomWindowText: e.target.value })
+                  }
+                  style={{ marginTop: 6 }}
+                />
+
             </div>
+            
 
             <div className="dm-pane-field">
               <label>Exit?</label>
