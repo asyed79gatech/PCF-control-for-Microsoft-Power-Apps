@@ -24,10 +24,38 @@
   width: 100%;
 }
 
-.dm-table th,
-.dm-table td {
-  border: 1px solid #ccc;
-  vertical-align: top;
+/* =========================
+   Freeze panes (sticky header row + sticky first column)
+   ========================= */
+
+/* 1) Sticky header row */
+.dm-table thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;          /* important so content doesn't show through */
+  z-index: 3;                /* above body cells */
+}
+
+/* 2) Sticky first column (row header column)
+   - applies to the header cell in the header row AND
+     the first cell in each body row
+*/
+.dm-table thead th:first-child,
+.dm-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  background: #fff;          /* important so cells scrolling underneath are hidden */
+  z-index: 2;                /* above regular cells, below header row */
+}
+
+/* 3) Top-left corner cell: needs to be above BOTH sticky layers */
+.dm-table thead th:first-child {
+  z-index: 4;
+}
+
+/* Optional: add a subtle separator shadow so the frozen column edge is clear */
+.dm-table tbody td:first-child {
+  box-shadow: 2px 0 0 rgba(0,0,0,0.06);
 }
 
 .dm-input {
@@ -410,4 +438,12 @@
   padding: 8px;
   font-size: 12px;
   color: #605e5c;
+}
+
+.dm-table { border-collapse: collapse; }
+
+.dm-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
 }
