@@ -1732,22 +1732,19 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                     setCustomRowText(rows[pane.index]?.RowHeader || "");
                   } else {
                     // already custom mode -> apply custom text now
-                    const text = (customRowText || "").trim();
-                    updateAssessmentMeta(pane.index, { AssessmentName: text });
                     setCustomRowMode(false);
                     setCustomRowText("");
-                    setPane(null);
                   }
                 }}
               >
-                {customRowMode ? "Save Custom Assessment" : "Enter Custom Assessment"}
+                {customRowMode ? "Add Standard Assessment" : "Enter Custom Assessment"}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
                   if (customRowMode) {
-                    // if user hits Save & Close while in custom mode, apply too
+                    // Save & Clsoe from custom mode should still apply the custom text
                     const text = (customRowText || "").trim();
                     updateAssessmentMeta(pane.index, { AssessmentName: text });
                     setCustomRowMode(false);
