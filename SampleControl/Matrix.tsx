@@ -610,7 +610,44 @@ const MEDICAL_CONCOMITANT_ASSESSMENTS: string[] = ["Medical History", "Concomita
 const MEDICAL_CONCOMITANT_COLLECTION_OPTIONS: string[] = ["Source Only", "Targeted CRF: All ocular and targeted systemic", "Full data in source CRF"]
 
 const OCT_ASSESSMENTS: string[] = ["Optical Coherence Tomography (OCT)"];
-const OCT_SEGMENT_OPTIONS: string[] = ["Posterior", "Anterior"]
+const OCT_SEGMENT_OPTIONS: string[] = ["Posterior", "Anterior"];
+
+const VISIT_NUMBER_OPTIONS: string[] = [
+  "Visit 00",
+  "Visit 0",
+  "Visit 1",
+  "Visit 2",
+  "Visit 3",
+  "Visit 4",
+  "Visit 5",
+  "Visit 6",
+  "Visit 7",
+  "Visit 8",
+  "Visit 9",
+  "Visit 10",
+  "Visit 11",
+  "Visit 12",
+  "Visit 13",
+  "Visit 14",
+  "Visit 15",
+  "Visit 16",
+  "Visit 17",
+  "Visit 18",
+  "Visit 19",
+  "Visit 20",
+  "Visit 00A",
+  "Visit 0A",
+  "Visit 1A",
+  "Visit 2A",
+  "Visit 3A",
+  "Visit 4A",
+  "Visit 5A",
+  "Visit 6A",
+  "Visit 7A",
+  "Visit 8A",
+  "Visit 9A",
+  "Visit 10A"
+]
 
 const VISIT_NAME_OPTIONS: string[] = [
   "Baseline",
@@ -1077,14 +1114,12 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                 onChange={e => updateVisitMeta(pane.index, { VisitNumber: e.target.value })}
               >
                 <option value=""></option>
-                {Array.from({ length: 22 }, (_, k) => k - 1)
-                  .filter(x => x >= 0)
-                  .map(n => (
-                    <option key={n} value={n === 0 ? "Visit 0" : `Visit ${n}`}>
-                      {n === 0 ? "Visit 0" : `Visit ${n}`}
-                    </option>
-                  ))}
-                <option value="Visit 00">Visit 00</option>
+                {VISIT_NUMBER_OPTIONS.map(opt => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}                
+
               </select>
             </div>
 
