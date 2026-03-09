@@ -868,7 +868,10 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
   const [assessmentMeta, setAssessmentMeta] = React.useState<AssessmentMeta[]>([]);
   const [pane, setPane] = React.useState<PaneState>(null);
 
-  // enhancement #3 - custom assessment entry mode (for row pane)
+  // enhancement - custom window entry mode (for column panae)
+  const [customWindowText, setcustomWindowText] = React.useState("");
+
+  // enhancement - custom assessment entry mode (for row pane)
   const [customRowMode, setCustomRowMode] = React.useState(false);
   const [customRowText, setCustomRowText] = React.useState("");
 
@@ -1186,10 +1189,9 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                   type="text"
                   className="dm-input"
                   placeholder="Add Custom Window"
-                  value={vm.CustomWindowText ?? ""}
-                  onChange={e =>
-                    updateVisitMeta(pane.index, { CustomWindowText: e.target.value })
-                  }
+                  value={customWindowText}
+                  onChange={e => setcustomWindowText(e.target.value)}
+                  onBlur={() => updateVisitMeta(pane.index, { CustomWindowText: customWindowText})}
                   style={{ marginTop: 6 }}
                 />
 
@@ -1209,7 +1211,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
             </div>
 
             <div className="dm-pane-footer">
-              <button type="button" onClick={() => setPane(null)}>
+              <button type="button" onClick={() => {updateVisitMeta(pane.index, { CustomWindowText:customWindowText }); setPane(null);}}>
                 Save & Close
               </button>
             </div>
@@ -1798,6 +1800,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                         setPane({ mode: "column", index: i });
                         setCustomRowMode(false);
                         setCustomRowText("");
+                        setcustomWindowText(visitMeta[i]?.CustomWindowText ?? "");
                       }}
                     >
                       {c}
