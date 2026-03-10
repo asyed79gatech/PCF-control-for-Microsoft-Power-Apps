@@ -5,6 +5,7 @@ type Row = { RowHeader: string; Cells: string[] };
 type VisitMeta = {
   VisitNumber?: string;
   VisitName?: string;
+  CustomVisitNameText?: string;
   Lens?: string;
   TimepointUnit?: string;
   TimepointValue?: string;
@@ -762,6 +763,8 @@ const formatAssessmentHeader = (meta: AssessmentMeta): string => {
 const formatVisitHeader = (meta: VisitMeta): string => {
   const lines: string[] = [];
   if (meta.VisitNumber) lines.push(meta.VisitNumber);
+  const visitNameDisplay = meta.CustomVisitNameText?.trim() || meta.VisitName;
+  if (visitNameDisplay) lines.push(visitNameDisplay);
   if (meta.VisitName) lines.push(meta.VisitName);
   if (meta.Lens) lines.push(`${meta.Lens}`);
   if (meta.TimepointUnit && meta.TimepointValue) lines.push(`${meta.TimepointUnit} ${meta.TimepointValue}`);
@@ -907,6 +910,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
 
   // enhancement - custom window entry mode (for column panae)
   const [customWindowText, setcustomWindowText] = React.useState("");
+  const [customVisitNameText, setCustomVisitNameText] = React.useState("");
 
   // enhancement - custom assessment entry mode (for row pane)
   const [customRowMode, setCustomRowMode] = React.useState(false);
@@ -1126,8 +1130,9 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
             <div className="dm-pane-field">
               <label>Visit Name</label>
               <select
-                value={vm.VisitName ?? ""}
-                onChange={e => updateVisitMeta(pane.index, { VisitName: e.target.value })}
+                value={customVisitNameText ? "" : (vm.VisitName ?? "")}
+                onChange={e => {
+                  updateVisitMeta(pane.index, { VisitName: e.target.value, CustomVisitNameText: "" });}}
               >
                 <option value=""></option>
                 {VISIT_NAME_OPTIONS.map(opt => (
@@ -1136,6 +1141,20 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                   </option>
                 ))}
               </select>
+              <input
+                type="text"
+                className="dm-input"
+                placeholder="Add Custom Visit Name"
+                value={customVisitNameText}
+                onChange={e => {
+                  setCustomVisitNameText(e.target.value);
+                  if (e.target.value) {
+                    updateVisitMeta(pane.index, {VisitName: "" });
+                  }
+                }}
+                onBlur={() => updateVisitMeta(pane.index, {CustomVisitNameText: customVisitNameText})}
+                style={{ marginTop: 6}}
+              />
             </div>
 
             <div className="dm-pane-field">
@@ -1246,7 +1265,10 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
             </div>
 
             <div className="dm-pane-footer">
-              <button type="button" onClick={() => {updateVisitMeta(pane.index, { CustomWindowText:customWindowText }); setPane(null);}}>
+              <button type="button" onClick={() => {
+                  updateVisitMeta(pane.index, { CustomWindowText:customWindowText, CustomVisitNameText: customVisitNameText }); 
+                  setPane(null);
+                  }}>
                 Save & Close
               </button>
             </div>
@@ -1836,6 +1858,7 @@ export const Matrix: React.FC<MatrixProps> = ({ initialJson, onChange }) => {
                         setCustomRowMode(false);
                         setCustomRowText("");
                         setcustomWindowText(visitMeta[i]?.CustomWindowText ?? "");
+                        setCustomVisitNameText(visitMeta[i]?.CustomVisitNameText ?? "");
                       }}
                     >
                       {c}
