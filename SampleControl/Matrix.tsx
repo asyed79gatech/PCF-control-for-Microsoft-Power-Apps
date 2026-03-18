@@ -765,7 +765,6 @@ const formatVisitHeader = (meta: VisitMeta): string => {
   if (meta.VisitNumber) lines.push(meta.VisitNumber);
   const visitNameDisplay = meta.CustomVisitNameText?.trim() || meta.VisitName;
   if (visitNameDisplay) lines.push(visitNameDisplay);
-  if (meta.VisitName) lines.push(meta.VisitName);
   if (meta.Lens) lines.push(`${meta.Lens}`);
   if (meta.TimepointUnit && meta.TimepointValue) lines.push(`${meta.TimepointUnit} ${meta.TimepointValue}`);
   if (meta.WindowSign && meta.WindowValue && meta.WindowUnit) lines.push(`${meta.WindowSign} ${meta.WindowValue} ${meta.WindowUnit}`);
