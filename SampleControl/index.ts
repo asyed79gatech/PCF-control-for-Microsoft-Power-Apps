@@ -2,7 +2,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { Matrix } from "./Matrix";
-export class VisitsAssessments13 implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class VisitsAssessments14 implements ComponentFramework.StandardControl<IInputs, IOutputs> {
  private _container!: HTMLDivElement;
  private _root: Root | undefined;
  private _notify!: () => void;
